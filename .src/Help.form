@@ -1,0 +1,11 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,64,38)
+  Text = ("Help and usage")
+  { Label1 Label
+    MoveScaled(2,1,59,36)
+    AutoResize = True
+    Text = ("Make SRT subtitles for music videos or movie by clicking.\n\nStep 1: set the total length of the music video or movie. \nThis is in the following format: \"mm:ss\" so 05:09 means 5 minutes\nand 9 seconds.\n\nStep 2: paste the text (lyrics, subtitles) inside the left textbox\n\nStep 3: start playing the video and immediately click start\n\nStep 4: click \"Add line\" when you hear a sentence.\nThis is line per line, taken from the left textbox.\nThe right textbox will show the result.\n\nStep 5: when there are no lines left to be added, the \"Add line\"\nbutton changes into \"Save SRT\". This allows for saving\nthe result.")
+  }
+}

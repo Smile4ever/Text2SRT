@@ -1,0 +1,32 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,104,65)
+  { txtInputText TextArea
+    MoveScaled(2,10,41,54)
+  }
+  { txtSRT TextArea
+    MoveScaled(44,10,59,54)
+    Expand = True
+  }
+  { lblLength TextLabel
+    MoveScaled(2,2,6,4)
+    Text = ("Length:")
+  }
+  { btnTime Button
+    MoveScaled(87,5,16,4)
+    Text = ("Add line")
+  }
+  { btnStart Button
+    MoveScaled(76,5,10,4)
+    Text = ("Start")
+  }
+  { txtLength TextBox
+    MoveScaled(9,1,12,4)
+    ToolTip = ("04:05")
+  }
+  { btnHelp Button
+    MoveScaled(76,1,27,4)
+    Text = ("Help and usage")
+  }
+}

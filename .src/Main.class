@@ -1,0 +1,85 @@
+' Gambas class file
+
+Public lineCounter As Integer = 0
+Public startTime As Date
+
+Public Sub _new()
+
+End
+
+Public Sub Form_Open()
+
+End
+
+Public Sub AddSRTItem()
+    
+    Dim srtItem As String
+    Dim strLyricsClean As String = Replace(txtInputText.Text, "\n\n", "\n")
+    Dim strTime As Date = Now - startTime
+    Dim lyricsCleanArray As String[] = Split(strLyricsClean, "\n")
+
+    If lineCounter < lyricsCleanArray.Count Then
+        'txtSRT.Text = Replace(txtSRT.Text, "{{NEXT}}", getTime(strTime))
+        txtSRT.Text = Replace(txtSRT.Text, "00:" & txtLength.Text & ",000", getTime(strTime))
+        srtItem = (lineCounter + 1) & "\n" & getTime(strTime) & " --> " & "00:" & txtLength.Text & ",000" & "\n" & Split(strLyricsClean, "\n")[lineCounter]
+        txtSRT.Text &= srtItem & "\n\n"
+       
+        If lineCounter + 1 == lyricsCleanArray.Count Then
+            'btnTime.Enabled = False
+            btnTime.Text = "Save SRT"
+        End If
+        lineCounter = lineCounter + 1
+
+        txtSRT.Line = 4 * (lineCounter + 1)
+
+    End If
+End
+
+
+Public Function getTime(datetime As Date) As String
+
+    Dim strTime As String = Time(datetime)
+    Dim strFormattedTime As String
+    strFormattedTime = Mid(strTime, 1, 8) & "," & Mid(strTime, 10, 1) & "00"
+    Return strFormattedTime
+
+End
+
+Public Sub btnTime_Click()
+
+    If btnTime.Text = "Add line" Then
+        AddSRTItem()
+    Else
+        'Save file
+          Dialog.Title = "Save SRT file as.."
+          Dialog.Filter = ["*.srt", "SubRip (SRT) file"]
+          
+          If Dialog.SaveFile() Then Return
+          
+          File.Save(Dialog.Path, txtSRT.Text)
+          Shell "notify-send 'SRT file saved to' '" & Dialog.Path & "' --icon=dialog-information"
+        Catch
+          Message.Info(Error.Text)
+    End If
+
+End
+
+Public Sub Form_Resize()
+
+    txtSRT.Height = Main.Height - 90
+    txtInputText.Height = Main.Height - 90
+    
+End
+
+Public Sub btnStart_Click()
+    txtSRT.Text = ""
+    lineCounter = 0
+    startTime = Time(Now)
+    btnTime.Text = "Add line"
+End
+
+Public Sub btnHelp_Click()
+
+    Help.Show()
+
+End
