@@ -2,14 +2,30 @@
 
 Public lineCounter As Integer = 0
 Public startTime As Date
+Public emptyLineCounter As Integer = 0
+Public filename As String
 
 Public Sub _new()
 
 End
 
 Public Sub Form_Open()
-
+    'txtLength.SetFocus()
+    
+    UpdateButtons()
 End
+
+Public Sub UpdateButtons()
+    
+     If rdbMoviePasteText.Value = True Then
+        'Auto paste
+        btnPasteText.Visible = False
+    Else
+        btnPasteText.Visible = True
+    Endif
+    
+End
+
 
 Public Sub AddSRTItem()
     
@@ -17,31 +33,54 @@ Public Sub AddSRTItem()
     Dim strLyricsClean As String = Replace(txtInputText.Text, "\n\n", "\n")
     Dim strTime As Date = Now - startTime
     Dim lyricsCleanArray As String[] = Split(strLyricsClean, "\n")
-
+    Dim strSecondTime As String = ".?."
+    
     If lineCounter < lyricsCleanArray.Count Then
-        'txtSRT.Text = Replace(txtSRT.Text, "{{NEXT}}", getTime(strTime))
-        txtSRT.Text = Replace(txtSRT.Text, "00:" & txtLength.Text & ",000", getTime(strTime))
-        srtItem = (lineCounter + 1) & "\n" & getTime(strTime) & " --> " & "00:" & txtLength.Text & ",000" & "\n" & Split(strLyricsClean, "\n")[lineCounter]
+        'txtSRT.Text = Replace(txtSRT.Text, "{{NEXT}}", TimeCalc.getTime(strTime))
+        
+        txtSRT.Text = Replace(txtSRT.Text, strSecondTime, TimeCalc.getTime(strTime))
+        If lineCounter + 1 == lyricsCleanArray.Count Then
+            strSecondTime = "00:" & TimeCalc.ConvertHTimeToDecimal(txtLength.Text) & ",000"
+        End If
+        srtItem = (lineCounter + 1) & "\n" & TimeCalc.getTime(strTime) & " --> " & strSecondTime & "\n" & Split(strLyricsClean, "\n")[lineCounter]
         txtSRT.Text &= srtItem & "\n\n"
        
         If lineCounter + 1 == lyricsCleanArray.Count Then
             'btnTime.Enabled = False
+            Main.Text = "Text2SRT"
             btnTime.Text = "Save SRT"
+            btnStart.Text = "Start"
+            btnInsertEmpty.Enabled = False
         End If
         lineCounter = lineCounter + 1
 
-        txtSRT.Line = 4 * (lineCounter + 1)
+        txtSRT.Line = 4 * (lineCounter + emptyLineCounter + 1)
+        txtInputText.Line = lineCounter + emptyLineCounter + 1
 
     End If
 End
 
+Public Sub btnInsertEmpty_Click()
 
-Public Function getTime(datetime As Date) As String
+    Dim srtItem As String
+    Dim strLyricsClean As String = Replace(txtInputText.Text, "\n\n", "\n")
+    Dim strTime As Date = Now - startTime
+    Dim lyricsCleanArray As String[] = Split(strLyricsClean, "\n")
+    Dim strSecondTime As String = ".?."
+    
+    If lineCounter < lyricsCleanArray.Count Then
+        txtSRT.Text = Replace(txtSRT.Text, strSecondTime, TimeCalc.getTime(strTime))
+        If lineCounter + 1 == lyricsCleanArray.Count Then
+             'strSecondTime = "00:" & TimeCalc.ConvertHTimeToDecimal(txtLength.Text) & ",000"
+             Return
+        End If
+       
+        emptyLineCounter = emptyLineCounter + 1
 
-    Dim strTime As String = Time(datetime)
-    Dim strFormattedTime As String
-    strFormattedTime = Mid(strTime, 1, 8) & "," & Mid(strTime, 10, 1) & "00"
-    Return strFormattedTime
+        txtSRT.Line = 4 * (lineCounter + emptyLineCounter + 1)
+        txtInputText.Line = lineCounter + emptyLineCounter + 1
+
+    End If
 
 End
 
@@ -53,7 +92,7 @@ Public Sub btnTime_Click()
         'Save file
           Dialog.Title = "Save SRT file as.."
           Dialog.Filter = ["*.srt", "SubRip (SRT) file"]
-          
+        
           If Dialog.SaveFile() Then Return
           
           File.Save(Dialog.Path, txtSRT.Text)
@@ -66,20 +105,77 @@ End
 
 Public Sub Form_Resize()
 
-    txtSRT.Height = Main.Height - 90
-    txtInputText.Height = Main.Height - 90
-    
+    txtSRT.Height = Main.Height - 70
+    txtInputText.Height = Main.Height - 70
+    optionsPanel.Height = Main.Height - 70
+    optionsPanel.Left = Main.Width - optionsPanel.Width
+    btnHelp.Left = Main.Width - btnHelp.Width
 End
 
 Public Sub btnStart_Click()
+    If txtLength.Text = "" Then
+        Message("Length is required. For more information, see Help and Usage.")
+        Return
+    Endif
+    
+    If txtInputText.Text = "" Then
+        If rdbLyricsAutoPaste.Value = True Then
+            txtInputText.Text = Clipboard.Paste("text/plain")
+        Else
+            Message("The input text cannot be empty. Enabling auto paste from clipboard can reduce the number of steps needed to generate an SRT file. For more information, see Help and Usage.")
+            Return
+        End If
+    End If
+
+    Main.Text = "Text2SRT [Recording " & filename & "]"
     txtSRT.Text = ""
     lineCounter = 0
     startTime = Time(Now)
     btnTime.Text = "Add line"
+    btnStart.Text = "Restart"
+    btnInsertEmpty.Enabled = True
 End
 
 Public Sub btnHelp_Click()
 
     Help.Show()
+
+End
+
+Public Sub btnPasteText_Click()
+
+    txtInputText.Text = Clipboard.Paste()
+
+End
+
+Public Sub btnOpen_Click()
+     Dim strFileSize As String
+     Dim artist_x As String
+     Dim title_x As String
+
+     Dialog.Title = "Open video file.."
+     Dialog.Filter = ["*.*", "Video files with audio"]
+
+     If Dialog.OpenFile() Then Return
+
+        Shell "ffmpeg -i \"" & Dialog.Path & "\" 2>&1 | grep Duration | cut -d ' ' -f 4 | sed s/,//" To strFileSize
+        txtLength.Text = Mid(strFileSize, 1, 8)
+        filename = Dialog.Path
+        Lyrics.init()
+        txtInputText.Text = Lyrics.get_lyrics()
+
+        Shell "xdg-open \"" & Dialog.Path & "\""
+        Wait 0.5
+        btnStart_Click()
+
+     Catch
+       Message.Info(Error.Text)
+
+End
+
+
+Public Sub moviesgroup_Click()
+
+    UpdateButtons()
 
 End

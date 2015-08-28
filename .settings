@@ -7,12 +7,18 @@ Count=0
 [DebugWindow/String]
 Geometry=[0,30,256,320]
 
+[DebugWindow/arrstrTime]
+Geometry=[0,30,256,320]
+
 [OpenFile]
 File[1]=".src/Main.form"
-Active=3
+Active=6
 File[2]=".src/Main.class:2.0"
-Count=3
+Count=6
 File[3]=".src/Help.form"
+File[4]=".src/TimeCalc.module:51.47"
+File[5]="TODO.md:3.32"
+File[6]=".src/Lyrics.module:145.23"
 
 [Watches]
 Count=0
