@@ -17,7 +17,7 @@ Public Sub lstFileName_Select()
     If lstFileName.Text == "General" Then
         lblInformation.Text = "Make SRT subtitles for music videos or movies by clicking.<br><br>" &
         "<b>Step 1: Setting the options</b><br>" &
-        "In the right panel, choose which kind (movie, music video) you want to" &
+        "In the right panel, choose which kind (movie, music video) you want to " &
         "subtitle. Now, choose the way you will provide the input text (movie text or lyrics):<br><br>" & 
         "Movie (length &gt; 15 minutes)<br>" &
         "- Auto paste movie text (default): this option requires that you copy the movie text " &
