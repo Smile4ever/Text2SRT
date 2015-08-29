@@ -3,7 +3,7 @@
 - gambas3-ide (and it's dependencies)
 - ffmpeg
 - git
-- python-html2text
+- libnotify
 
 Recommended:
 * VLC Media Player (or any video player that supports SRT subtitles)

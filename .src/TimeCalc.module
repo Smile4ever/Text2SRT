@@ -29,6 +29,9 @@ Public Function ConvertHTimeToDecimal(strTime As String) As String
     
     'Already decimal
     If intLocationHour == 0 And intLocationMinutes == 0 And intLocationSeconds == 0 Then
+        If InStr(strTime, "00:") < 2 Then
+            Return Mid(strTime, 4)
+        Endif
         Return strTime
     Endif
     

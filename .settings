@@ -11,7 +11,11 @@ Geometry=[0,30,256,320]
 Geometry=[0,30,256,320]
 
 [OpenFile]
-Count=0
+Count=3
+Active=3
+File[1]=".src/Help.class:19.80"
+File[2]=".src/Lyrics.module:329.56"
+File[3]="INSTALL.md:6.0"
 
 [Watches]
 Count=0

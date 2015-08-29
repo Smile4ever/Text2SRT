@@ -85,7 +85,7 @@ Public Function get_lyrics() As String
         
         If artist_and_location > 0 Then
             artist_and_location = InStr(artist_metro, "and", artist_and_location - 2)
-            If artist_and_location Then
+            If artist_and_location > 0 Then
                 If is_lyric_page(lyric_string) == False Then
                     'vlc.msg.dbg("location:"..string.len(artist_metro) - artist_and_location)
                     If string.len(artist_metro) - artist_and_location < 14 Then
@@ -320,11 +320,14 @@ Public Function getCleanFilename(filename As String) As String
     
     Dim locationdot As Integer
     Dim locationslash As Integer
+    Dim locationparenthesis As Integer
     
     locationslash = RInStr(filename, "/") 
     filename = Mid(filename, locationslash + 1)
     locationdot = RInStr(filename, ".")
     filename = Mid(filename, 1, locationdot - 1)
+    locationparenthesis = RInStr(filename, "(")
+    filename = Mid(filename, 1, locationparenthesis - 1)
     
     Return filename
     
