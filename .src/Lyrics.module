@@ -325,7 +325,7 @@ Public Function getCleanFilename(filename As String) As String
     locationslash = RInStr(filename, "/") 
     filename = Mid(filename, locationslash + 1)
     locationdot = RInStr(filename, ".")
-    filename = Mid(filename, 1, locationdot - 1)
+    filename = Mid(filename, 1, locationdot)
     locationparenthesis = RInStr(filename, "(")
     filename = Mid(filename, 1, locationparenthesis - 1)
     
@@ -385,6 +385,7 @@ Public Function get_title() As String
         'no space after pos
         amount = 1
     Else
+        
         'was + 1
         If space_after_pos > pos - 1 Then
             amount = 1
