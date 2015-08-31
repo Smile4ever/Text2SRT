@@ -5,7 +5,7 @@
   Text = ("Help and usage")
   { lstFileName ListBox
     MoveScaled(1,2,16,16)
-    List = [("General"), ("File name")]
+    List = [("General"), ("File name"), ("Recording")]
   }
   { lblInformation TextLabel
     MoveScaled(18,2,68,106)

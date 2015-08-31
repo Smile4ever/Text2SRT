@@ -2,16 +2,18 @@
 
 'Format date as SRT time (00:00:27,000)
 Public Function getTime(datetime As Date) As String
-
+    
     Dim strTime As String = Time(datetime)
     Dim strFormattedTime As String
+    
     strFormattedTime = Mid(strTime, 1, 8) & "," & Mid(strTime, 10, 1) & "00"
     Return strFormattedTime
-
+    
 End
 
 'Convert human readable time into decimal time (5h3m6s to 05:03:06)
-Public Function ConvertHTimeToDecimal(strTime As String) As String
+'strLeadingZeros only has effect if component is selected
+Public Function ConvertHTimeToDecimal(strTime As String, Optional strLeadingZeros As Boolean = False, Optional component As String = "all") As String
     
     Dim strDecimalTime As String
     Dim intLocationHour As Integer
@@ -28,16 +30,32 @@ Public Function ConvertHTimeToDecimal(strTime As String) As String
     intLocationSeconds = InStr(strTime, "s")
     
     'Already decimal
+    
     If intLocationHour == 0 And intLocationMinutes == 0 And intLocationSeconds == 0 Then
-        If InStr(strTime, "00:") < 2 Then
-            Return Mid(strTime, 4)
+        If component == "all" Then
+            If InStr(strTime, "00:") < 2 Then
+                Return Mid(strTime, 4)
+            Endif
+            Return strTime
         Endif
-        Return strTime
+        If component == "h" Then
+            Return ZeroTime(Mid(strTime, 1, 2), strLeadingZeros)
+        Endif
+        If component == "m" Then
+            Return ZeroTime(Mid(strTime, 4, 2), strLeadingZeros)
+        Endif
+        If component == "s" Then
+            Return ZeroTime(Mid(strTime, 7, 2), strLeadingZeros)
+        Endif
     Endif
     
     If intLocationHour > 0 Then
         arrstrSplit = Split(strTime, "h")
         strDecimalTime = ZeroPadTime(arrstrSplit[0])
+        
+        If component == "h" Then
+            Return ZeroTime(arrstrSplit[0], strLeadingZeros)
+        Endif
         
         If arrstrSplit[1] <> Null Then
             strRestOfTime = arrstrSplit[1]
@@ -48,17 +66,23 @@ Public Function ConvertHTimeToDecimal(strTime As String) As String
     
     'Minutes without m but with h (for example, 5h8 is 5 hours and 8 minutes)
     If intLocationMinutes == 0 And strRestOfTime <> "" And intLocationHour > 0 Then
+        If component == "m" Then
+            Return ZeroTime(arrstrSplit[1], strLeadingZeros)
+        Endif
         strDecimalTime &= ":" & ZeroPadTime(arrstrSplit[1])
     Endif
     
     If intLocationMinutes > 0 Then
         arrstrSplit = Split(strRestOfTime, "m")
-        If Len(strDecimalTime) > 0 Then
-             strDecimalTime &= ":" & ZeroPadTime(arrstrSplit[0])
-        Else
-             strDecimalTime = ZeroPadTime(arrstrSplit[0])
+        If component == "m" Then
+            Return ZeroTime(arrstrSplit[0], strLeadingZeros)
         Endif
-       
+        If Len(strDecimalTime) > 0 Then
+            strDecimalTime &= ":" & ZeroPadTime(arrstrSplit[0])
+        Else
+            strDecimalTime = ZeroPadTime(arrstrSplit[0])
+        Endif
+        
         If arrstrSplit[1] <> Null Then
             strRestOfTime = arrstrSplit[1]
         End If
@@ -70,51 +94,58 @@ Public Function ConvertHTimeToDecimal(strTime As String) As String
     
     If intLocationSeconds > 0 Then
         arrstrSplit = Split(strRestOfTime, "s")
+        If component == "s" Then
+            Return ZeroTime(arrstrSplit[0], strLeadingZeros)
+        Endif
+        
         If Len(strDecimalTime) > 0 Then
-             strDecimalTime &= ":" & ZeroPadTime(arrstrSplit[0])
+            strDecimalTime &= ":" & ZeroPadTime(arrstrSplit[0])
         Else
-             strDecimalTime = ZeroPadTime(arrstrSplit[0])
+            strDecimalTime = ZeroPadTime(arrstrSplit[0])
         Endif
     Endif
-   
+    
     'Seconds without s but with m (for example, 5m8 is 5 minutes and 8 seconds)
     If intLocationSeconds == 0 And strRestOfTime <> "" And intLocationMinutes > 0 Then
+        If component == "s" Then
+            Return ZeroTime(arrstrSplit[1], strLeadingZeros)
+        Endif
         strDecimalTime &= ":" & ZeroPadTime(arrstrSplit[1])
     Endif 
-   
+    
     Return strDecimalTime
+    
 End
 
 Public Function ZeroPadTime(strTime As String) As String
     
-     If Len(strTime) = 1 Then
+    If Len(strTime) = 1 Then
         Return "0" & strTime
-     End If
-     
-     Return strTime
+    End If
+    
+    Return strTime
     
 End
 
 Public Function ZeroUnpadTime(strTime As String) As String
     
-  If Mid(strTime, 1, 1) == "0" Then
-      Return Mid(strTime, 2)
-  Endif
-  
-  Return strTime
+    If Mid(strTime, 1, 1) == "0" Then
+        Return Mid(strTime, 2)
+    Endif
+    
+    Return strTime
     
 End
 
 Public Function ZeroTime(strTime As String, strLeadingZeros As Boolean) As String
     
-  If strLeadingZeros Then
-    Return ZeroPadTime(strTime)
-  Else
-    Return ZeroUnpadTime(strTime)
-  End If
-      
+    If strLeadingZeros Then
+        Return ZeroPadTime(strTime)
+    Else
+        Return ZeroUnpadTime(strTime)
+    End If
+    
 End
-
 
 'Convert 04:05:06 to 4h5m6s and convert 05:06 to 5m6s
 'Parameter strLeadingZeros pads or unpads the time components.
@@ -142,7 +173,7 @@ Public Function ConvertDecimalTimeToHTime(strTime As String, Optional strLeading
             Return ZeroTime(arrstrTime[2], strLeadingZeros)
         Endif
         strHTime = ZeroTime(arrstrTime[0], strLeadingZeros) & "h" & ZeroTime(arrstrTime[1], strLeadingZeros) & "m" & ZeroTime(arrstrTime[2], strLeadingZeros) & "s"
-
+        
     Endif
     
     If arrstrTime.Count = 2 Then
@@ -159,4 +190,5 @@ Public Function ConvertDecimalTimeToHTime(strTime As String, Optional strLeading
     Endif
     
     Return strHTime
+
 End

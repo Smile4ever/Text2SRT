@@ -1,9 +1,9 @@
 # Gambas Form File 3.0
 
 { Form Form
-  MoveScaled(0,0,129,68)
+  MoveScaled(0,0,130,68)
   { btnPasteText Button
-    MoveScaled(20,1,21,4)
+    MoveScaled(20,1,24,4)
     Text = ("Paste text from clipboard")
   }
   { btnStart Button
@@ -12,14 +12,14 @@
   }
   { btnInsertEmpty Button
     MoveScaled(71,1,16,4)
-    Text = ("Finish current line")
+    Text = ("Add pause")
   }
   { btnTime Button
     MoveScaled(87,1,16,4)
     Text = ("Add line")
   }
   { btnHelp Button
-    MoveScaled(103,1,26,4)
+    MoveScaled(105,1,24,4)
     Text = ("Help and usage")
   }
   { txtSRT TextArea
@@ -34,28 +34,30 @@
     Text = ("Open video file")
   }
   { optionsPanel ToolPanel
-    MoveScaled(104,6,25,58)
-    Count = 2
+    MoveScaled(104,6,27.5,58)
+    Count = 3
     Index = 0
     Text = ("Input text")
     { btnRestoreInputOptions Button
-      MoveScaled(1,24,23,4)
+      MoveScaled(1,24,24,4)
       Text = ("Restore defaults")
     }
     { txtLength TextBox
-      MoveScaled(8,36,12,4)
-      ToolTip = ("04:05")
+      MoveScaled(9,36,12,4)
+      ToolTip = ("1h4m5s")
     }
     { lblLength TextLabel
-      MoveScaled(1,37,6,4)
+      MoveScaled(1,37,7,4)
       NoTabFocus = True
+      Expand = True
+      AutoResize = True
       Text = ("Length:")
     }
     { Panel2 Panel
-      MoveScaled(1,11,24,13)
+      MoveScaled(1,11,25,13)
       { lblMusicVideos Label
         MoveScaled(0,0,24,4)
-        Text = ("Music videos (<15m)")
+        Text = ("Music videos (<15min)")
       }
       { rdbLyricsSearch RadioButton lyricsgroup
         Name = "rdbLyricsSearch"
@@ -74,16 +76,12 @@
         Text = ("Manual paste")
       }
     }
-    { TextLabel1 TextLabel
-      MoveScaled(1,10,22,23)
-      Font = Font["+4"]
-      Text = ("<b>NOT\nYET\nIMPLEMENTED</b>")
-    }
     { Panel1 Panel
-      MoveScaled(1,0,24,10)
+      MoveScaled(1,0,25,10)
       { rdbMoviePasteText RadioButton moviesgroup
         Name = "rdbMoviePasteText"
         MoveScaled(1,3,24,4)
+        Expand = True
         Text = ("Auto paste movie text")
         Value = True
       }
@@ -98,10 +96,24 @@
       }
     }
     Index = 1
+    Text = ("Player")
+    { cmbPlayers ComboBox
+      MoveScaled(0,3,24,4)
+      List = [("System default"), ("VLC Media Player"), ("GNOME Videos (Totem)"), ("Noise Player"), ("xnoise")]
+    }
+    Index = 2
     Text = ("Advanced")
-    { lblTODO Label
-      MoveScaled(1,1,24,5)
-      Text = ("TODO: implement custom\nlength")
+    { lblBoundary Label
+      MoveScaled(2,0,24,5)
+      Text = ("Boundary (longer than\nthis is a movie):")
+    }
+    { SpinBox1 SpinBox
+      MoveScaled(2,5,9,4)
+      Value = 15
+    }
+    { lblBoundary2 Label
+      MoveScaled(12,4,24,5)
+      Text = ("minutes")
     }
     Index = 0
   }

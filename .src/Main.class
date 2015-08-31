@@ -4,6 +4,8 @@ Public lineCounter As Integer = 0
 Public startTime As Date
 Public emptyLineCounter As Integer = 0
 Public filename As String
+Public strCommand As String
+Public boundary As Integer = 15
 
 Public Sub _new()
 
@@ -13,15 +15,16 @@ Public Sub Form_Open()
     'txtLength.SetFocus()
     
     UpdateButtons()
+    cmbPlayers.Index = 0
 End
 
 Public Sub UpdateButtons()
     
-     If rdbMoviePasteText.Value = True Then
-        'Auto paste
-        btnPasteText.Visible = False
-    Else
+    If rdbMovieManual.Value = True Or rdbLyricsManualPaste.Value = True Then
         btnPasteText.Visible = True
+    Else
+         'Auto paste
+        btnPasteText.Visible = False
     Endif
     
 End
@@ -109,31 +112,72 @@ Public Sub Form_Resize()
     txtInputText.Height = Main.Height - 70
     optionsPanel.Height = Main.Height - 70
     optionsPanel.Left = Main.Width - optionsPanel.Width
-    btnHelp.Left = Main.Width - btnHelp.Width
+    btnHelp.Left = Main.Width - btnHelp.Width - 20
 End
 
-Public Sub btnStart_Click()
+Public Function StartIsValid() As Boolean
+     Dim intMinuteLength As Integer
+     
     If txtLength.Text = "" Then
         Message("Length is required. For more information, see Help and Usage.")
-        Return
-    Endif
-    
-    If txtInputText.Text = "" Then
-        If rdbLyricsAutoPaste.Value = True Then
-            txtInputText.Text = Clipboard.Paste("text/plain")
-        Else
-            Message("The input text cannot be empty. Enabling auto paste from clipboard can reduce the number of steps needed to generate an SRT file. For more information, see Help and Usage.")
-            Return
-        End If
+        Return False
     End If
+   
+    intMinuteLength = Val(TimeCalc.ConvertHTimeToDecimal(txtLength.Text, False, "m"))
+    If intMinuteLength < boundary Then
+        'Lyrics code
+       If rdbLyricsAutoPaste.Value = True Then
+            txtInputText.Text = Clipboard.Paste("text/plain")
+            If txtInputText.Text = "" Then
+                Message("Clipboard is empty")
+                Return False
+            Endif
+            Return True
+       Endif
+       If rdbLyricsSearch.Value = True Then
+           'search lyrics here
+           Lyrics.init()
+           txtInputText.Text = Lyrics.get_lyrics()
+           If txtInputText.Text = "" Then
+               Message("Lyrics not found with automatic searching. Try the auto paste or manual mode.")
+               Return False
+           End If
+           Return True
+       Endif
+       If txtInputText.Text = "" Then
+           Message("The input text cannot be empty. Enabling auto paste from clipboard can reduce the number of steps needed to generate an SRT file. For more information, see Help and Usage.")
+           Return False
+       Endif
+    Else
+        'Movie code
+        If rdbMoviePasteText.Value == True Then
+            txtInputText.Text = Clipboard.Paste("text/plain")
+            If txtInputText.Text = "" Then
+                Message("Clipboard is empty")
+                Return False
+            Endif
+            Return True
+        Endif
+    Endif
 
-    Main.Text = "Text2SRT [Recording " & filename & "]"
-    txtSRT.Text = ""
-    lineCounter = 0
-    startTime = Time(Now)
-    btnTime.Text = "Add line"
-    btnStart.Text = "Restart"
-    btnInsertEmpty.Enabled = True
+    Return True
+End
+
+
+Public Sub btnStart_Click()
+
+    If StartIsValid() Then
+        Shell strCommand & " \"" & Dialog.Path & "\""
+        Wait 0.5
+        
+        Main.Text = "Text2SRT [Recording " & filename & "]"
+        txtSRT.Text = ""
+        lineCounter = 0
+        startTime = Time(Now)
+        btnTime.Text = "Add line"
+        btnStart.Text = "Restart"
+        btnInsertEmpty.Enabled = True
+    End If
 End
 
 Public Sub btnHelp_Click()
@@ -161,11 +205,7 @@ Public Sub btnOpen_Click()
         Shell "ffmpeg -i \"" & Dialog.Path & "\" 2>&1 | grep Duration | cut -d ' ' -f 4 | sed s/,//" To strFileSize
         txtLength.Text = Mid(strFileSize, 1, 8)
         filename = Dialog.Path
-        Lyrics.init()
-        txtInputText.Text = Lyrics.get_lyrics()
-
-        Shell "xdg-open \"" & Dialog.Path & "\""
-        Wait 0.5
+       
         btnStart_Click()
 
      Catch
@@ -177,5 +217,44 @@ End
 Public Sub moviesgroup_Click()
 
     UpdateButtons()
+
+End
+
+Public Sub cmbPlayers_Change()
+    Dim path As String
+
+    If cmbPlayers.Text = "System default" Then
+        strCommand = "xdg-open"
+    Endif
+    If cmbPlayers.Text = "VLC Media Player" Then
+        strCommand = "vlc"
+    Endif
+    If cmbPlayers.Text = "Noise Player" Then
+        strCommand = "noise-player"
+    Endif
+    If cmbPlayers.Text = "GNOME Videos (Totem)" Then
+        strCommand = "totem"
+    Endif
+    If cmbPlayers.Text = "xnoise" Then
+        strCommand = "xnoise"
+    Endif
+    Shell "which " & cmbPlayers.Text To path
+    If path <> "" Then
+        strCommand = cmbPlayers.Text
+    End If
+
+End
+
+
+Public Sub lyricsgroup_Click()
+
+    UpdateButtons()
+
+End
+
+Public Sub SpinBox1_Change()
+    lblMovies.Text = "Movies (>" & SpinBox1.Value & "min)"
+    lblMusicVideos.Text = "Music videos (<" & SpinBox1.Value & "min)"
+    boundary = SpinBox1.Value
 
 End
