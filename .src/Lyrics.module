@@ -284,6 +284,8 @@ Function fetch_lyrics(url As String) As String
                 b = InStr(data, "<br>", b - 10)
             End If
             
+            data = Replace(data, "\r", "\n")
+            
             If b == 0 Then
                 Return ""
             End If
