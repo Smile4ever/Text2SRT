@@ -12,12 +12,12 @@ Geometry=[0,30,256,320]
 
 [OpenFile]
 Count=8
-Active=8
+Active=3
 File[1]=".src/Help.class:46.85"
 File[2]=".src/Lyrics.module:330.4"
-File[3]="INSTALL.md:6.0"
+File[3]="INSTALL.md:11.133"
 File[4]=".src/Main.form"
-File[5]=".src/Main.class:141.74"
+File[5]=".src/Main.class:209.66"
 File[6]=".src/Help.form"
 File[7]=".src/TimeCalc.module:47.64"
 File[8]="TODO.md:10.14"

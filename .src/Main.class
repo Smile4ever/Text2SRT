@@ -239,6 +239,9 @@ Public Sub cmbPlayers_Change()
     If cmbPlayers.Text = "System default" Then
         strCommand = "xdg-open"
     Endif
+    If cmbPlayers.Text = "Audience" Then
+        strCommand = "audience" 'requires ubuntu-restricted-extras to play MP4 files
+    Endif
     If cmbPlayers.Text = "VLC Media Player" Then
         strCommand = "vlc"
     Endif
@@ -265,9 +268,9 @@ Public Sub lyricsgroup_Click()
 
 End
 
-Public Sub SpinBox1_Change()
-    lblMovies.Text = "Movies (>" & SpinBox1.Value & "min)"
-    lblMusicVideos.Text = "Music videos (<" & SpinBox1.Value & "min)"
-    boundary = SpinBox1.Value
+Public Sub spinBoundary_Change()
+    lblMovies.Text = "Movies (>" & spinBoundary.Value & "min)"
+    lblMusicVideos.Text = "Music videos (<" & spinBoundary.Value & "min)"
+    boundary = spinBoundary.Value
 
 End
