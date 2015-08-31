@@ -1,7 +1,7 @@
 == Requirements ==
 - Any Linux distribution
 - gambas3-ide (and it's dependencies)
-- ffmpeg
+- ffmpeg or libav-tools (avconv)
 - git
 - libnotify
 
@@ -9,7 +9,7 @@ Recommended:
 * VLC Media Player (or any video player that supports SRT subtitles)
 
 == Installation ==
-If you have not installed gambas3-ide, do it now using your packaging manager. The minimum requirement is v3.0. FFmpeg is required too. Any recent version (>2011) will do.
+If you have not installed gambas3-ide, do it now using your packaging manager. The minimum requirement is v3.0. FFmpeg or libav-tools is required too. Any recent version (>2011) will do.
 
 - cd
 - git clone https://github.com/Smile4ever/Text2SRT.git

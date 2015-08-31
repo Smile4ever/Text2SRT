@@ -196,13 +196,26 @@ Public Sub btnOpen_Click()
      Dim strFileSize As String
      Dim artist_x As String
      Dim title_x As String
-
+     Dim path As String
+     Dim strProgram As String
+     
      Dialog.Title = "Open video file.."
      Dialog.Filter = ["*.*", "Video files with audio"]
 
      If Dialog.OpenFile() Then Return
-
-        Shell "ffmpeg -i \"" & Dialog.Path & "\" 2>&1 | grep Duration | cut -d ' ' -f 4 | sed s/,//" To strFileSize
+        Shell "which ffmpeg" To path
+        If path == "" Then
+            Shell "which avconv" To path
+            If path == "" Then
+                Message("You need to install ffmpeg or libav-tools")
+                Return
+            Else
+                strProgram = "avconv"
+            Endif
+        Else
+            strProgram = "ffmpeg"
+        Endif
+        Shell strProgram & " -i \"" & Dialog.Path & "\" 2>&1 | grep Duration | cut -d ' ' -f 4 | sed s/,//" To strFileSize
         txtLength.Text = Mid(strFileSize, 1, 8)
         filename = Dialog.Path
        
