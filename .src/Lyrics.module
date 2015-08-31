@@ -152,6 +152,14 @@ Public Function get_lyrics() As String
         'source_label: set_text("MetroLyrics")
         'isLyricsMode = False;
     End If
+    'best coverage, but a bit slow To put first
+    If is_lyric_page(lyric_string) == False Then
+        url = "http://sonichits.com/video/" & artist_x & "/" & Replace(original_title, "-", "_")
+        lyric_string = fetch_lyrics(url)
+        'source_label: set_text("Sonic Hits")
+        'isLyricsMode = False
+    End If
+    
     Return lyric_string
     
 End
@@ -193,9 +201,11 @@ Function fetch_lyrics(url As String) As String
     Dim data As String
     Dim a As Integer
     Dim b As Integer
-    Dim metro_pos As Integer
     Dim endofstring As String
     Dim position As Integer
+    
+    Dim metro_pos As Integer
+    Dim sonichits As Integer
     
     Client.URL = url
     Client.Async = False
@@ -210,14 +220,19 @@ Function fetch_lyrics(url As String) As String
         If Lof(Client) Then data = Read #Client, Lof(Client)
         
         metro_pos = InStr(url, "metrolyrics")
+        sonichits = InStr(url, "sonichits")
+        
         'data = string.gsub(data, "&#(%d+)", string.char);
-        data = Replace(data, "<br/>", "")
-        data = Replace(data, "</p>", "")
-        data = Replace(data, "<p class='verse'>", "\n\n")
-        data = Trim(data)
+        
         If metro_pos > 0 Then
             'MetroLyrics
             'local _, a = string.find(data, '<div id="lyrics-body-text">')
+            
+            data = Replace(data, "<br/>", "")
+            data = Replace(data, "</p>", "")
+            data = Replace(data, "<p class='verse'>", "\n\n")
+            data = Trim(data)
+            
             a = InStr(data, "lyrics-body-text", 1)
             
             If a == 0 Then
@@ -239,8 +254,46 @@ Function fetch_lyrics(url As String) As String
             Return Mid(data, position + 4, b - position - 5) 'Lua uses :sub which uses begin and end. Gambas uses begin and length
         End If
         
-        Return data
+        If sonichits Then
+            a = InStr(data, "<div id=\"lyrics\"")
+            
+            If a == 0 Then
+                Return ""
+            End If
+            
+            endofstring = "<br>"
+            position = InStr(data, endofstring, a)
+            
+            If position == 0 Then
+                Return ""
+            End If
+            
+            position = InStr(data, endofstring, position + 1)
+            If position == 0 Then
+                Return ""
+            End If
+            
+            b = InStr(data, "Contributed by", a)
+            If b == 0 Then
+                b = InStr(data, "Lyrics", a)
+            End If
+            
+            If b == 0 Then
+                b = InStr(data, "</div>", a)
+            Else
+                b = InStr(data, "<br>", b - 10)
+            End If
+            
+            If b == 0 Then
+                Return ""
+            End If
+            
+            Return Replace(Mid(data, position + 4, b - position), "<br>", "")
+        End If
+        
     End If
+    
+    Return data
     
 End
 
@@ -403,5 +456,5 @@ Public Function get_title() As String
         Return Trim(filename)  
         
     End If
-
+    
 End
