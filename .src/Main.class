@@ -12,11 +12,17 @@ Public Sub _new()
 End
 
 Public Sub Form_Open()
-    'txtLength.SetFocus()
+    ReloadConfiguration()
+End
+
+Public Sub ReloadConfiguration()
     
     UpdateButtons()
+    UpdatePlayers()
     cmbPlayers.Index = 0
+    
 End
+
 
 Public Sub UpdateButtons()
     
@@ -169,7 +175,6 @@ Public Sub btnStart_Click()
     If StartIsValid() Then
         Shell strCommand & " \"" & Dialog.Path & "\""
         Wait 0.5
-        
         Main.Text = "Text2SRT [Recording " & filename & "]"
         txtSRT.Text = ""
         lineCounter = 0
@@ -233,27 +238,71 @@ Public Sub moviesgroup_Click()
 
 End
 
+Public Sub IsInstalled(strPlayer As String) As Boolean
+  
+   Dim path As String
+   Shell "which " & strPlayer To path  
+   If path <> "" Then
+       Return True
+   Endif
+   Return False
+   
+End
+
+Public Function SupportedPlayers() As String[]
+    'Amarok is not yet supported as it requires a smarter wait time
+    'Clementine is not yet supported as it requires a smarter wait time
+    'Dragon is not yet supported as it requires a smarter wait time
+    'lollypop (gnome player) is not yet supported as it requires a smarter wait time (at least the first time)
+    'Cantata is not supported.
+    'MPlayer is not supported.
+    
+    'Audacious works very well
+    'Guayadeque works very well
+    'Kaffeine works very well
+    'VLC Media Player works very well
+    
+    Return ["System default", "Audacious", "Audience", "DeaDBeeF", "GNOME MPlayer", "GNOME Videos (Totem)", "Guayadeque", "kaffeine", "Noise Player", "mpv", "SMPlayer", "VLC Media Player", "xnoise"]
+    
+End
+
+Public Function SupportedPlayersExecutables() As String[]
+    
+    Return ["xdg-open", "audacious", "audience", "deadbeef", "gnome-mplayer", "totem", "guayadeque", "kaffeine", "noise-player", "mpv", "smplayer", "vlc", "xnoise"]
+    
+End
+
+
+Public Sub UpdatePlayers()
+    Dim arrstrPlayers As String[] = SupportedPlayers()
+    Dim arrstrPlayersExecutable As String[] = SupportedPlayersExecutables()
+    Dim i As Integer
+    
+    cmbPlayers.Clear()
+    
+    For i = 0 To arrstrPlayersExecutable.Count - 1
+        If IsInstalled(arrstrPlayersExecutable[i]) Then
+            cmbPlayers.Add(arrstrPlayers[i])
+        Endif
+    Next
+End
+
+
 Public Sub cmbPlayers_Change()
     Dim path As String
-
-    If cmbPlayers.Text = "System default" Then
-        strCommand = "xdg-open"
-    Endif
-    If cmbPlayers.Text = "Audience" Then
-        strCommand = "audience" 'requires ubuntu-restricted-extras to play MP4 files
-    Endif
-    If cmbPlayers.Text = "VLC Media Player" Then
-        strCommand = "vlc"
-    Endif
-    If cmbPlayers.Text = "Noise Player" Then
-        strCommand = "noise-player"
-    Endif
-    If cmbPlayers.Text = "GNOME Videos (Totem)" Then
-        strCommand = "totem"
-    Endif
-    If cmbPlayers.Text = "xnoise" Then
-        strCommand = "xnoise"
-    Endif
+    Dim arrstrPlayers As String[] = SupportedPlayers()
+    Dim arrstrPlayersExecutable As String[] = SupportedPlayersExecutables()
+    Dim i As Integer
+    
+    For i = 0 To arrstrPlayers.Count - 1
+        If cmbPlayers.Text = arrstrPlayers[i] Then
+            strCommand = arrstrPlayersExecutable[i]
+            Return
+        Endif
+    Next
+    'audience requires ubuntu-restricted-extras to play MP4 files
+    'TODO: inform the user of this (if lsb_release is ubuntu)"
+   
     Shell "which " & cmbPlayers.Text To path
     If path <> "" Then
         strCommand = cmbPlayers.Text
@@ -272,5 +321,12 @@ Public Sub spinBoundary_Change()
     lblMovies.Text = "Movies (>" & spinBoundary.Value & "min)"
     lblMusicVideos.Text = "Music videos (<" & spinBoundary.Value & "min)"
     boundary = spinBoundary.Value
+
+End
+
+Public Sub btnReloadConfiguration_Click()
+
+    ReloadConfiguration()
+    Shell "notify-send 'Text2SRT' 'Configuration reloaded' --icon=dialog-information"
 
 End
