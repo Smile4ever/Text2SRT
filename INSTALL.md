@@ -1,8 +1,7 @@
 Requirements
 ------------
 - Any Linux distribution
-- Gambas 3:
--- gambas-ide gambas3-gb-net gambas3-gb-net-curl gambas3-gb-net-smtp
+- Gambas 3: gambas-ide gambas3-gb-net gambas3-gb-net-curl gambas3-gb-net-smtp
 - ffmpeg or libav-tools (avconv)
 - git
 - libnotify
