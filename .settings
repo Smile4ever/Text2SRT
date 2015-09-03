@@ -11,16 +11,17 @@ Geometry=[0,30,256,320]
 Geometry=[0,30,256,320]
 
 [OpenFile]
-Count=8
+Count=9
 Active=5
-File[1]=".src/Help.class:46.85"
-File[2]=".src/Lyrics.module:169.20"
+File[1]=".src/Help.class:39.101"
+File[2]=".src/Lyrics.module:293.32"
 File[3]="INSTALL.md:11.133"
 File[4]=".src/Main.form"
-File[5]=".src/Main.class:270.113"
+File[5]=".src/Main.class:33.24"
 File[6]=".src/Help.form"
-File[7]=".src/TimeCalc.module:47.64"
-File[8]="TODO.md:5.55"
+File[7]=".src/TimeCalc.module:10.4"
+File[8]="TODO.md:5.0"
+File[9]="mplayer-resumer/mplayer-resumer.pl:121.22"
 
 [Watches]
 Count=0

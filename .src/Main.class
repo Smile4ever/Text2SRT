@@ -6,42 +6,68 @@ Public emptyLineCounter As Integer = 0
 Public filename As String
 Public strCommand As String
 Public boundary As Integer = 15
+Public pauseTimeStart As Date
+Public timePassed As Date
+Public halfasecond As Date
 
 Public Sub _new()
-
+    
 End
 
 Public Sub Form_Open()
+    
     ReloadConfiguration()
+    
 End
 
 Public Sub ReloadConfiguration()
     
+    Dim i As Integer
+    
     UpdateButtons()
     UpdatePlayers()
+    'For i = 0 To cmbPlayers.List.Count - 1
+    '    If cmbPlayers[i].Text = "mpv" Then 'player-resumer
+    '        cmbPlayers.Index = i
+    '    Endif
+    'Next
     cmbPlayers.Index = 0
     
 End
-
 
 Public Sub UpdateButtons()
     
     If rdbMovieManual.Value = True Or rdbLyricsManualPaste.Value = True Then
         btnPasteText.Visible = True
     Else
-         'Auto paste
+        'Auto paste
         btnPasteText.Visible = False
     Endif
     
+End
+
+Public Sub CleanInputText(inputText As String) As String[]
+    
+    Dim strInputTextClean As String = Replace(txtInputText.Text, "\n\n", "\n")
+    Dim lyricsCleanArray As String[] = Split(strInputTextClean, "\n")
+    Dim lyricsCleanArrayCleanest As New String[]
+    
+    Dim i As Integer = 0
+    
+    For i = 0 To lyricsCleanArray.Count - 1
+        If Trim(lyricsCleanArray[i]) <> "" Then
+            lyricsCleanArrayCleanest.Add(lyricsCleanArray[i])
+        Endif
+    Next
+    Return lyricsCleanArrayCleanest
 End
 
 
 Public Sub AddSRTItem()
     
     Dim srtItem As String
-    Dim strLyricsClean As String = Replace(txtInputText.Text, "\n\n", "\n")
-    Dim strTime As Date = Now - startTime
-    Dim lyricsCleanArray As String[] = Split(strLyricsClean, "\n")
+    Dim strTime As Date = WhereWereWe()
+    Dim lyricsCleanArray As String[] = CleanInputText(txtInputText.Text)
     Dim strSecondTime As String = ".?."
     
     If lineCounter < lyricsCleanArray.Count Then
@@ -51,109 +77,125 @@ Public Sub AddSRTItem()
         If lineCounter + 1 == lyricsCleanArray.Count Then
             strSecondTime = "00:" & TimeCalc.ConvertHTimeToDecimal(txtLength.Text) & ",000"
         End If
-        srtItem = (lineCounter + 1) & "\n" & TimeCalc.getTime(strTime) & " --> " & strSecondTime & "\n" & Split(strLyricsClean, "\n")[lineCounter]
+        
+        srtItem = (lineCounter + 1) & "\n" & TimeCalc.getTime(strTime) & " --> " & strSecondTime & "\n" & lyricsCleanArray[lineCounter]
         txtSRT.Text &= srtItem & "\n\n"
-       
+        
         If lineCounter + 1 == lyricsCleanArray.Count Then
             'btnTime.Enabled = False
             Main.Text = "Text2SRT"
-            btnTime.Text = "Save SRT"
+            btnAddLine.Text = "Save SRT"
             btnStart.Text = "Start"
-            btnInsertEmpty.Enabled = False
+            btnAddPause.Enabled = False
         End If
         lineCounter = lineCounter + 1
-
+        
         txtSRT.Line = 4 * (lineCounter + emptyLineCounter + 1)
         txtInputText.Line = lineCounter + emptyLineCounter + 1
-
+        
     End If
+    
 End
 
-Public Sub btnInsertEmpty_Click()
+Public Function PausedTimePassed() As Date
+    
+    Return Now - pauseTimeStart
+    
+End
 
+Public Function WhereWereWe() As Date
+
+    Return Now - startTime - timePassed
+    
+End
+
+Public Sub btnAddPause_Click()
+    
     Dim srtItem As String
     Dim strLyricsClean As String = Replace(txtInputText.Text, "\n\n", "\n")
-    Dim strTime As Date = Now - startTime
+    Dim strTime As Date = WhereWereWe()
     Dim lyricsCleanArray As String[] = Split(strLyricsClean, "\n")
     Dim strSecondTime As String = ".?."
     
     If lineCounter < lyricsCleanArray.Count Then
         txtSRT.Text = Replace(txtSRT.Text, strSecondTime, TimeCalc.getTime(strTime))
         If lineCounter + 1 == lyricsCleanArray.Count Then
-             'strSecondTime = "00:" & TimeCalc.ConvertHTimeToDecimal(txtLength.Text) & ",000"
-             Return
+            'strSecondTime = "00:" & TimeCalc.ConvertHTimeToDecimal(txtLength.Text) & ",000"
+            Return
         End If
-       
+        
         emptyLineCounter = emptyLineCounter + 1
-
+        
         txtSRT.Line = 4 * (lineCounter + emptyLineCounter + 1)
         txtInputText.Line = lineCounter + emptyLineCounter + 1
-
+        
     End If
-
+    
 End
 
-Public Sub btnTime_Click()
-
-    If btnTime.Text = "Add line" Then
+Public Sub btnAddLine_Click()
+    
+    If btnAddLine.Text = "Add line" Then
         AddSRTItem()
     Else
         'Save file
-          Dialog.Title = "Save SRT file as.."
-          Dialog.Filter = ["*.srt", "SubRip (SRT) file"]
+        Dialog.Title = "Save SRT file as.."
+        Dialog.Filter = ["*.srt", "SubRip (SRT) file"]
         
-          If Dialog.SaveFile() Then Return
-          
-          File.Save(Dialog.Path, txtSRT.Text)
-          Shell "notify-send 'SRT file saved to' '" & Dialog.Path & "' --icon=dialog-information"
-        Catch
-          Message.Info(Error.Text)
+        If Dialog.SaveFile() Then Return
+        
+        File.Save(Dialog.Path, txtSRT.Text)
+        Shell "notify-send 'SRT file saved to' '" & Dialog.Path & "' --icon=dialog-information"
+    Catch
+        Message.Info(Error.Text)
     End If
-
+    
 End
 
 Public Sub Form_Resize()
-
+    
     txtSRT.Height = Main.Height - 70
     txtInputText.Height = Main.Height - 70
     optionsPanel.Height = Main.Height - 70
     optionsPanel.Left = Main.Width - optionsPanel.Width
     btnHelp.Left = Main.Width - btnHelp.Width - 20
+    
 End
 
 Public Function StartIsValid() As Boolean
-     Dim intMinuteLength As Integer
-     
+    
+    Dim intMinuteLength As Integer
+    
     If txtLength.Text = "" Then
         Message("Length is required. For more information, see Help and Usage.")
         Return False
     End If
-   
+    
     intMinuteLength = Val(TimeCalc.ConvertHTimeToDecimal(txtLength.Text, False, "m"))
     If intMinuteLength < boundary Then
         'Lyrics code
-       If rdbLyricsAutoPaste.Value = True Then
+        If rdbLyricsAutoPaste.Value = True Then
             txtInputText.Text = Clipboard.Paste("text/plain")
             If txtInputText.Text = "" Then
                 Message("Clipboard is empty")
                 Return False
             Endif
             Return True
-       Endif
-       If rdbLyricsSearch.Value = True Then
-           'search lyrics here
-           Lyrics.init()
-           txtInputText.Text = Lyrics.get_lyrics()
-           If txtInputText.Text = "" Then
-               Message("Lyrics not found with automatic searching. Try the auto paste or manual mode.")
-               Return False
-           End If
-           Return True
-       Endif
-       If txtInputText.Text = "" Then
-           Message("The input text cannot be empty. Enabling auto paste from clipboard can reduce the number of steps needed to generate an SRT file. For more information, see Help and Usage.")
-           Return False
-       Endif
+        Endif
+        If rdbLyricsSearch.Value = True Then
+            'search lyrics here
+            Lyrics.init()
+            txtInputText.Text = Lyrics.get_lyrics()
+            If txtInputText.Text = "" Then
+                Message("Lyrics not found with automatic searching. Try the auto paste or manual mode.")
+                Return False
+            End If
+            Return True
+        Endif
+        If txtInputText.Text = "" Then
+            Message("The input text cannot be empty. Enabling auto paste from clipboard can reduce the number of steps needed to generate an SRT file. For more information, see Help and Usage.")
+            Return False
+        Endif
     Else
         'Movie code
         If rdbMoviePasteText.Value == True Then
@@ -165,88 +207,99 @@ Public Function StartIsValid() As Boolean
             Return True
         Endif
     Endif
-
+    
     Return True
+    
 End
 
-
 Public Sub btnStart_Click()
-
+    Dim strOptions As String
+    
     If StartIsValid() Then
-        Shell strCommand & " \"" & Dialog.Path & "\""
+        If strCommand == "mpv" Then
+            strOptions = " --osd-level=2"
+        Endif
+        Shell strCommand & strOptions & " \"" & Dialog.Path & "\""
+        halfasecond = Time(Now)
         Wait 0.5
+        halfasecond = Time(Now) - halfasecond
         Main.Text = "Text2SRT [Recording " & filename & "]"
         txtSRT.Text = ""
         lineCounter = 0
         startTime = Time(Now)
-        btnTime.Text = "Add line"
+        btnPause.Text = "Pause"
+        btnAddLine.Enabled = True
+        btnAddPause.Enabled = True
+        btnAddLine.Text = "Add line"
         btnStart.Text = "Restart"
-        btnInsertEmpty.Enabled = True
+        btnAddPause.Enabled = True
     End If
+    
 End
 
 Public Sub btnHelp_Click()
-
+    
     Help.Show()
-
+    
 End
 
 Public Sub btnPasteText_Click()
-
+    
     txtInputText.Text = Clipboard.Paste()
-
+    
 End
 
 Public Sub btnOpen_Click()
-     Dim strFileSize As String
-     Dim artist_x As String
-     Dim title_x As String
-     Dim path As String
-     Dim strProgram As String
-     
-     Dialog.Title = "Open video file.."
-     Dialog.Filter = ["*.*", "Video files with audio"]
-
-     If Dialog.OpenFile() Then Return
-        Shell "which ffmpeg" To path
+    
+    Dim strFileSize As String
+    Dim artist_x As String
+    Dim title_x As String
+    Dim path As String
+    Dim strProgram As String
+    
+    Dialog.Title = "Open video file.."
+    Dialog.Filter = ["*.*", "Video files with audio"]
+    
+    If Dialog.OpenFile() Then Return
+    Shell "which ffmpeg" To path
+    If path == "" Then
+        Shell "which avconv" To path
         If path == "" Then
-            Shell "which avconv" To path
-            If path == "" Then
-                Message("You need to install ffmpeg or libav-tools")
-                Return
-            Else
-                strProgram = "avconv"
-            Endif
+            Message("You need to install ffmpeg or libav-tools")
+            Return
         Else
-            strProgram = "ffmpeg"
+            strProgram = "avconv"
         Endif
-        Shell strProgram & " -i \"" & Dialog.Path & "\" 2>&1 | grep Duration | cut -d ' ' -f 4 | sed s/,//" To strFileSize
-        txtLength.Text = Mid(strFileSize, 1, 8)
-        filename = Dialog.Path
-       
-        btnStart_Click()
-
-     Catch
-       Message.Info(Error.Text)
-
+    Else
+        strProgram = "ffmpeg"
+    Endif
+    Shell strProgram & " -i \"" & Dialog.Path & "\" 2>&1 | grep Duration | cut -d ' ' -f 4 | sed s/,//" To strFileSize
+    txtLength.Text = Mid(strFileSize, 1, 8)
+    filename = Dialog.Path
+    
+    btnStart_Click()
+    
+Catch
+    Message.Info(Error.Text)
+    
 End
 
-
 Public Sub moviesgroup_Click()
-
+    
     UpdateButtons()
-
+    
 End
 
 Public Sub IsInstalled(strPlayer As String) As Boolean
-  
-   Dim path As String
-   Shell "which " & strPlayer To path  
-   If path <> "" Then
-       Return True
-   Endif
-   Return False
-   
+    
+    Dim path As String
+    
+    Shell "which " & strPlayer To path  
+    If path <> "" Then
+        Return True
+    Endif
+    Return False
+    
 End
 
 Public Function SupportedPlayers() As String[]
@@ -255,12 +308,16 @@ Public Function SupportedPlayers() As String[]
     'Dragon is not yet supported as it requires a smarter wait time
     'lollypop (gnome player) is not yet supported as it requires a smarter wait time (at least the first time)
     'Cantata is not supported.
-    'MPlayer is not supported.
+    'MPlayer is not supported. See:
+    'http://ubuntuforums.org/showthread.php?t=2213319
+    'http://marc.info/?l=mplayer-users&m=134998152225053&w=2
     
     'Audacious works very well
     'Guayadeque works very well
     'Kaffeine works very well
     'VLC Media Player works very well
+    
+    'mplayer-resumer might become supported in the future
     
     Return ["System default", "Audacious", "Audience", "DeaDBeeF", "GNOME MPlayer", "GNOME Videos (Totem)", "Guayadeque", "kaffeine", "Noise Player", "mpv", "SMPlayer", "VLC Media Player", "xnoise"]
     
@@ -272,8 +329,8 @@ Public Function SupportedPlayersExecutables() As String[]
     
 End
 
-
 Public Sub UpdatePlayers()
+    
     Dim arrstrPlayers As String[] = SupportedPlayers()
     Dim arrstrPlayersExecutable As String[] = SupportedPlayersExecutables()
     Dim i As Integer
@@ -285,10 +342,11 @@ Public Sub UpdatePlayers()
             cmbPlayers.Add(arrstrPlayers[i])
         Endif
     Next
+    
 End
 
-
 Public Sub cmbPlayers_Change()
+    
     Dim path As String
     Dim arrstrPlayers As String[] = SupportedPlayers()
     Dim arrstrPlayersExecutable As String[] = SupportedPlayersExecutables()
@@ -302,31 +360,80 @@ Public Sub cmbPlayers_Change()
     Next
     'audience requires ubuntu-restricted-extras to play MP4 files
     'TODO: inform the user of this (if lsb_release is ubuntu)"
-   
+    
+    'Custom player (path to binary) is supported too
     Shell "which " & cmbPlayers.Text To path
     If path <> "" Then
         strCommand = cmbPlayers.Text
     End If
-
+    
 End
 
-
 Public Sub lyricsgroup_Click()
-
+    
     UpdateButtons()
-
+    
 End
 
 Public Sub spinBoundary_Change()
+    
     lblMovies.Text = "Movies (>" & spinBoundary.Value & "min)"
     lblMusicVideos.Text = "Music videos (<" & spinBoundary.Value & "min)"
     boundary = spinBoundary.Value
-
+    
 End
 
 Public Sub btnReloadConfiguration_Click()
-
+    
     ReloadConfiguration()
     Shell "notify-send 'Text2SRT' 'Configuration reloaded' --icon=dialog-information"
+    
+End
 
+Public Sub btnPause_Click()
+
+    Dim pathToDesktopFile As String
+    Dim mimetype As String
+    Dim realCommand As String
+    'Shell "file --mime-type \"" & Main.filename & "\"" To mimetype
+
+    If strCommand == "xdg-open" Then
+        Shell "xdg-mime query filetype \"" & Main.filename & "\"" To mimetype
+        Shell "xdg-mime query default " & mimetype To pathToDesktopFile
+        If InStr(pathToDesktopFile, "mpv") > 0 Then
+            realCommand = "mpv"
+        Endif
+        If InStr(pathToDesktopFile, "vlc") > 0 Then
+            realCommand = "vlc"
+        Endif
+    Else
+        realCommand = strCommand
+    Endif
+    
+    If realCommand == "mpv" Or realCommand == "vlc" Then
+        If InStr(btnPause.Text, "PAUSED") > 0 Then
+            btnPause.Text = "Pause"
+            btnAddLine.Enabled = True
+            btnAddPause.Enabled = True
+            
+            If realCommand == "vlc" Then
+                'This will be inaccurate for MPEG-PS, see https://trac.videolan.org/vlc/ticket/6705
+                'start half a second earlier to compensate for the startup time of VLC
+                Shell "vlc" & " --start-time=" & TimeCalc.getSeconds(Split(TimeCalc.getTime(WhereWereWe() - halfasecond), ",")[0]) & " \"" & Dialog.Path & "\""
+            Endif
+            If realCommand == "mpv" Then
+                Shell "mpv" & " --osd-level=2 --start=" & Split(TimeCalc.getTime(WhereWereWe() - halfasecond), ",")[0] & " \"" & Dialog.Path & "\""
+            Endif
+            timePassed += PausedTimePassed() ' + 90 'Second and a half
+        Else
+            pauseTimeStart = Now
+            btnPause.Text = "PAUSED at " & Split(TimeCalc.getTime(WhereWereWe()), ",")[0]
+            btnAddLine.Enabled = False
+            btnAddPause.Enabled = False
+            Shell "pkill " & realCommand
+        Endif
+    Else
+        Message("This option can only be used with mpv or VLC Media Player. Please set mpv or VLC Media Player as your player.")
+    Endif
+    
 End

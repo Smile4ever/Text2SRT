@@ -192,3 +192,14 @@ Public Function ConvertDecimalTimeToHTime(strTime As String, Optional strLeading
     Return strHTime
 
 End
+
+Public Function getSeconds(datetime As String) As String
+    
+  Return (ConvertDecimalTimeToHTime(datetime, False, "h") * 3600 + ConvertDecimalTimeToHTime(datetime, False, "m") * 60 + ConvertDecimalTimeToHTime(datetime, False, "s")) & ""
+  'More performant, but more error prone too?:
+  'Dim arrstrTime As String[] = Split(datetime, ":")
+  'Val(arrstrTime[0]) * 3600 + Val(arrstrTime[1]) * 60 + Val(arrstrTime[2])
+End
+
+
+

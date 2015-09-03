@@ -7,15 +7,15 @@
     Text = ("Paste text from clipboard")
   }
   { btnStart Button
-    MoveScaled(61,1,10,4)
+    MoveScaled(42,1,10,4)
     Text = ("Start")
   }
-  { btnInsertEmpty Button
-    MoveScaled(71,1,16,4)
+  { btnAddPause Button
+    MoveScaled(76,1,13,4)
     Text = ("Add pause")
   }
-  { btnTime Button
-    MoveScaled(87,1,16,4)
+  { btnAddLine Button
+    MoveScaled(89,1,14,4)
     Text = ("Add line")
   }
   { btnHelp Button
@@ -23,11 +23,11 @@
     Text = ("Help and usage")
   }
   { txtSRT TextArea
-    MoveScaled(51,6,52,58)
+    MoveScaled(51,6,52,61)
     Expand = True
   }
   { txtInputText TextArea
-    MoveScaled(2,6,48,58)
+    MoveScaled(2,6,48,61)
   }
   { btnOpen Button
     MoveScaled(2,1,16,4)
@@ -99,7 +99,6 @@
     Text = ("Player")
     { cmbPlayers ComboBox
       MoveScaled(1,3,23,4)
-      List = Null
     }
     Index = 2
     Text = ("Advanced")
@@ -120,5 +119,9 @@
       Text = ("Reload configuration")
     }
     Index = 0
+  }
+  { btnPause Button
+    MoveScaled(53,1,23,4)
+    Text = ("Pause")
   }
 }

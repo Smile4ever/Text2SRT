@@ -207,6 +207,8 @@ Function fetch_lyrics(url As String) As String
     Dim metro_pos As Integer
     Dim sonichits As Integer
     
+    Dim newlinestring As String
+    
     Client.URL = url
     Client.Async = False
     'Client.Timeout = intTimeOut
@@ -289,8 +291,12 @@ Function fetch_lyrics(url As String) As String
             If b == 0 Then
                 Return ""
             End If
-            
-            Return Replace(Mid(data, position + 4, b - position), "<br>", "")
+            If InStr(data, "<br>\n") == 0 Then
+                newlinestring = "\n"
+            Else
+                newlinestring = ""
+            Endif
+            Return Replace(Mid(data, position + 4, b - position), "<br>", newlinestring)
         End If
         
     End If
