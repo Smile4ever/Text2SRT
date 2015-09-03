@@ -1,4 +1,5 @@
-== Requirements ==
+Requirements
+------------
 - Any Linux distribution
 - Gambas 3:
 -- gambas-ide gambas3-gb-net gambas3-gb-net-curl gambas3-gb-net-smtp
@@ -14,7 +15,8 @@ Recommended players:
 
 Other players can be used too, but only these two support the pause mode for now.
 
-== Installation ==
+Installation
+------------
 If you have not installed gambas3-ide, do it now using your packaging manager. The minimum requirement is v3.0. FFmpeg or libav-tools is required too. Any recent version (>2011) will do.
 
 - cd
