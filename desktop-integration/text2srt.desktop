@@ -7,4 +7,4 @@ Name=Text2SRT
 Categories=Utility;
 Comment=
 Path=
-StartupNotify=true
+StartupNotify=false
