@@ -163,11 +163,50 @@ End
 
 Public Sub Form_Resize()
     
-    txtSRT.Height = Main.Height - 70
-    txtInputText.Height = Main.Height - 70
-    optionsPanel.Height = Main.Height - 70
+    Dim minHeight As Integer = 70
+    
+    txtSRT.Height = Main.Height - minHeight
+    txtInputText.Height = Main.Height - minHeight
+    optionsPanel.Height = Main.Height - minHeight
+    HSplit1.Height = Main.Height - minHeight
+
+    btnHelp.Text = "Help and usage"
+    btnHelp.Width = 192
+    btnHelp.Visible = True
+    optionsPanel.Visible = True
+    optionsPanel.Width = 320
+    btnHelp.Visible = True
+    lblNextLine.Visible = True
+    lblNextUp.Visible = True
+    btnOptions.Visible = False
+
+    If Main.Width < 900 Then
+        btnHelp.Width = 60
+        btnHelp.Text = "Help"
+        btnAddPause.X = Main.Width - 210 - btnHelp.Width
+        btnAddLine.X = Main.Width - 120 - btnHelp.Width  '       
+            '
+        If Main.Width < 800 Then
+            btnHelp.Visible = False
+            btnAddPause.X = Main.Width - 190
+            btnAddLine.X = Main.Width - 100
+        Endif
+
+        If Main.Width < 550 Then
+            lblNextUp.Visible = False
+            lblNextLine.Visible = False
+            btnOptions.Visible = True
+        Endif
+    Else
+        btnAddPause.X = Main.Width - btnAddLine.Width - btnAddLine.Width - optionsPanel.Width
+        btnAddLine.X = Main.Width - btnAddLine.Width - optionsPanel.Width
+    Endif
+    
+    ShowMessage(Main.Width)
+    
     optionsPanel.Left = Main.Width - optionsPanel.Width
     btnHelp.Left = Main.Width - btnHelp.Width - 20
+    hsplit1.Width = Main.Width - optionsPanel.Width - 20
     
 End
 
@@ -501,4 +540,17 @@ Public Sub btnStopRecording_Click()
     StopRecording()
     txtSRT.Text = Replace(txtSRT.Text, ".?.", TimeCalc.getTime(TimeCalc.ConvertHTimeToDecimal(txtLength.Text)))
     Shell "pkill " & strCommand
+End
+
+Public Sub btnOptions_Click()
+
+    optionsPanel.Visible = Not optionsPanel.Visible
+    If optionsPanel.Visible Then
+        optionsPanel.Width = Main.Width - 20
+        optionsPanel.X = 10
+        hsplit1.Width = 0
+    Else
+        hsplit1.Width = Main.Width - 20
+        optionsPanel.Width = 0
+    Endif
 End

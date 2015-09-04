@@ -154,4 +154,9 @@
       Wrap = True
     }
   }
+  { btnOptions Button
+    MoveScaled(18,1,10,4)
+    Visible = False
+    Text = ("Options")
+  }
 }
