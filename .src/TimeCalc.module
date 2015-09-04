@@ -6,6 +6,10 @@ Public Function getTime(datetime As Date) As String
     Dim strTime As String = Time(datetime)
     Dim strFormattedTime As String
     
+    If Len(strTime) == 0 Then
+        Return "00:00:00,000"
+    Endif
+    
     strFormattedTime = Mid(strTime, 1, 8) & "," & Mid(strTime, 10, 1) & "00"
     Return strFormattedTime
     

@@ -7,6 +7,7 @@ Requirements
 - libnotify
 - xdg-utils
 - pkill (for pause functionality)
+- gambas3-gb-gtk (for GTK support)
 
 Recommended players:
 * mpv

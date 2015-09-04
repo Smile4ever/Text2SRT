@@ -1,15 +1,7 @@
 # Gambas Form File 3.0
 
 { Form Form
-  MoveScaled(0,0,130,68)
-  { btnPasteText Button
-    MoveScaled(20,1,24,4)
-    Text = ("Paste text from clipboard")
-  }
-  { btnStart Button
-    MoveScaled(42,1,10,4)
-    Text = ("Start")
-  }
+  MoveScaled(0,0,148,68)
   { btnAddPause Button
     MoveScaled(76,1,13,4)
     Text = ("Add pause")
@@ -33,28 +25,62 @@
     MoveScaled(2,1,16,4)
     Text = ("Open video file")
   }
-  { optionsPanel ToolPanel
-    MoveScaled(104,6,27.5,58)
+  { optionsPanel TabStrip
+    MoveScaled(105,6,40,46)
     Count = 3
+    Orientation = Align.Right
     Index = 0
+    Text = ("Tools")
+    { frmTools Frame
+      MoveScaled(1,1,25,16)
+      Text = ("Tools")
+      { btnTooEarly Button
+        MoveScaled(1,3,23,4)
+        Text = ("Fix too early")
+      }
+      { btnPasteText Button
+        MoveScaled(1,7,23,4)
+        Text = ("Paste text from clipboard")
+      }
+    }
+    { frmPlayback Frame
+      MoveScaled(1,18,25,24)
+      Text = ("Playback")
+      { btnStart Button
+        MoveScaled(1,3,23,4)
+        Text = ("Start")
+      }
+      { btnPause Button
+        MoveScaled(1,7,23,4)
+        Text = ("Pause")
+      }
+      { cmbPlayers ComboBox
+        MoveScaled(1,11,23,4)
+      }
+    }
+    Index = 1
     Text = ("Input text")
-    { btnRestoreInputOptions Button
-      MoveScaled(1,24,24,4)
-      Text = ("Restore defaults")
-    }
-    { txtLength TextBox
-      MoveScaled(9,36,12,4)
-      ToolTip = ("1h4m5s")
-    }
-    { lblLength TextLabel
-      MoveScaled(1,37,7,4)
-      NoTabFocus = True
-      Expand = True
-      AutoResize = True
-      Text = ("Length:")
+    { Panel1 Panel
+      MoveScaled(0,0,25,10)
+      { rdbMoviePasteText RadioButton moviesgroup
+        Name = "rdbMoviePasteText"
+        MoveScaled(1,3,24,4)
+        Expand = True
+        Text = ("Auto paste movie text")
+        Value = True
+      }
+      { lblMovies Label
+        MoveScaled(0,0,24,4)
+        Text = ("Movies (>15min)")
+      }
+      { rdbMovieManual RadioButton moviesgroup
+        Name = "rdbMovieManual"
+        MoveScaled(1,6,19,4)
+        Text = ("Manual paste")
+      }
     }
     { Panel2 Panel
-      MoveScaled(1,11,25,13)
+      MoveScaled(0,11,25,13)
       { lblMusicVideos Label
         MoveScaled(0,0,24,4)
         Text = ("Music videos (<15min)")
@@ -76,52 +102,47 @@
         Text = ("Manual paste")
       }
     }
-    { Panel1 Panel
-      MoveScaled(1,0,25,10)
-      { rdbMoviePasteText RadioButton moviesgroup
-        Name = "rdbMoviePasteText"
-        MoveScaled(1,3,24,4)
-        Expand = True
-        Text = ("Auto paste movie text")
-        Value = True
-      }
-      { lblMovies Label
-        MoveScaled(0,0,24,4)
-        Text = ("Movies (>15min)")
-      }
-      { rdbMovieManual RadioButton moviesgroup
-        Name = "rdbMovieManual"
-        MoveScaled(1,6,19,4)
-        Text = ("Manual paste")
-      }
+    { lblLength TextLabel
+      MoveScaled(0,25,7,4)
+      NoTabFocus = True
+      Expand = True
+      AutoResize = True
+      Text = ("Length:")
     }
-    Index = 1
-    Text = ("Player")
-    { cmbPlayers ComboBox
-      MoveScaled(1,3,23,4)
+    { txtLength TextBox
+      MoveScaled(8,24,12,4)
+      ToolTip = ("1h4m5s")
     }
     Index = 2
     Text = ("Advanced")
     { lblBoundary Label
-      MoveScaled(2,0,24,5)
+      MoveScaled(1,1,24,5)
       Text = ("Boundary (longer than\nthis is a movie):")
     }
     { spinBoundary SpinBox
-      MoveScaled(2,6,9,4)
+      MoveScaled(1,7,9,4)
       Value = 15
     }
     { lblBoundary2 Label
-      MoveScaled(12,5,24,5)
+      MoveScaled(11,6,24,5)
       Text = ("minutes")
     }
     { btnReloadConfiguration Button
-      MoveScaled(1,20,24,4)
+      MoveScaled(1,12,24,4)
       Text = ("Reload configuration")
+    }
+    { btnRestoreInputOptions Button
+      MoveScaled(1,16,24,4)
+      Text = ("Restore defaults")
     }
     Index = 0
   }
-  { btnPause Button
-    MoveScaled(53,1,23,4)
-    Text = ("Pause")
+  { lblNextUp Label
+    MoveScaled(19,1,8,4)
+    Text = ("Next up:")
+  }
+  { lblNextLine TextLabel
+    MoveScaled(27.75,0.5,47,5)
+    Alignment = Align.Left
   }
 }

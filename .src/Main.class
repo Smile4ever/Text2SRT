@@ -22,10 +22,11 @@ End
 
 Public Sub ReloadConfiguration()
     
-    Dim i As Integer
+    'Dim i As Integer
     
     UpdateButtons()
     UpdatePlayers()
+
     'For i = 0 To cmbPlayers.List.Count - 1
     '    If cmbPlayers[i].Text = "mpv" Then 'player-resumer
     '        cmbPlayers.Index = i
@@ -38,17 +39,17 @@ End
 Public Sub UpdateButtons()
     
     If rdbMovieManual.Value = True Or rdbLyricsManualPaste.Value = True Then
-        btnPasteText.Visible = True
+        btnPasteText.Enabled = True
     Else
         'Auto paste
-        btnPasteText.Visible = False
+        btnPasteText.Enabled = False
     Endif
     
 End
 
 Public Sub CleanInputText(inputText As String) As String[]
     
-    Dim strInputTextClean As String = Replace(txtInputText.Text, "\n\n", "\n")
+    Dim strInputTextClean As String = Replace(inputText, "\n\n", "\n")
     Dim lyricsCleanArray As String[] = Split(strInputTextClean, "\n")
     Dim lyricsCleanArrayCleanest As New String[]
     
@@ -60,8 +61,8 @@ Public Sub CleanInputText(inputText As String) As String[]
         Endif
     Next
     Return lyricsCleanArrayCleanest
-End
 
+End
 
 Public Sub AddSRTItem()
     
@@ -70,6 +71,9 @@ Public Sub AddSRTItem()
     Dim lyricsCleanArray As String[] = CleanInputText(txtInputText.Text)
     Dim strSecondTime As String = ".?."
     
+    'ShowMessage(timePassed, "timepassed")
+    'ShowMessage(strTime, "strTime")
+    
     If lineCounter < lyricsCleanArray.Count Then
         'txtSRT.Text = Replace(txtSRT.Text, "{{NEXT}}", TimeCalc.getTime(strTime))
         
@@ -77,24 +81,26 @@ Public Sub AddSRTItem()
         If lineCounter + 1 == lyricsCleanArray.Count Then
             strSecondTime = "00:" & TimeCalc.ConvertHTimeToDecimal(txtLength.Text) & ",000"
         End If
-        
+
         srtItem = (lineCounter + 1) & "\n" & TimeCalc.getTime(strTime) & " --> " & strSecondTime & "\n" & lyricsCleanArray[lineCounter]
         txtSRT.Text &= srtItem & "\n\n"
-        
-        If lineCounter + 1 == lyricsCleanArray.Count Then
+
+        lineCounter = lineCounter + 1
+        If lineCounter == lyricsCleanArray.Count Then
             'btnTime.Enabled = False
             Main.Text = "Text2SRT"
             btnAddLine.Text = "Save SRT"
             btnStart.Text = "Start"
             btnAddPause.Enabled = False
+        Else
+            UpdateNextUp()
         End If
-        lineCounter = lineCounter + 1
-        
+
         txtSRT.Line = 4 * (lineCounter + emptyLineCounter + 1)
         txtInputText.Line = lineCounter + emptyLineCounter + 1
-        
+
     End If
-    
+
 End
 
 Public Function PausedTimePassed() As Date
@@ -104,16 +110,17 @@ Public Function PausedTimePassed() As Date
 End
 
 Public Function WhereWereWe() As Date
-
+    
     Return Now - startTime - timePassed
     
 End
 
 Public Sub btnAddPause_Click()
     
-    Dim srtItem As String
+    'Dim srtItem As String
     Dim strLyricsClean As String = Replace(txtInputText.Text, "\n\n", "\n")
     Dim strTime As Date = WhereWereWe()
+    
     Dim lyricsCleanArray As String[] = Split(strLyricsClean, "\n")
     Dim strSecondTime As String = ".?."
     
@@ -213,29 +220,44 @@ Public Function StartIsValid() As Boolean
 End
 
 Public Sub btnStart_Click()
+
     Dim strOptions As String
+    Dim timeNow As Date
     
     If StartIsValid() Then
         If strCommand == "mpv" Then
             strOptions = " --osd-level=2"
         Endif
+        cmbPlayers_Change()
+        Shell "pkill " & strCommand
+        Wait 0.01
         Shell strCommand & strOptions & " \"" & Dialog.Path & "\""
         halfasecond = Time(Now)
         Wait 0.5
-        halfasecond = Time(Now) - halfasecond
+        timenow = Time(Now)
+        halfasecond = timenow - halfasecond
         Main.Text = "Text2SRT [Recording " & filename & "]"
         txtSRT.Text = ""
         lineCounter = 0
-        startTime = Time(Now)
+        startTime = timenow
         btnPause.Text = "Pause"
         btnAddLine.Enabled = True
         btnAddPause.Enabled = True
         btnAddLine.Text = "Add line"
         btnStart.Text = "Restart"
         btnAddPause.Enabled = True
+        UpdateNextUp()
+        
     End If
     
 End
+
+Public Sub UpdateNextUp()
+    
+  lblNextLine.Text = CleanInputText(txtInputText.Text)[lineCounter]  
+    
+End
+
 
 Public Sub btnHelp_Click()
     
@@ -252,8 +274,6 @@ End
 Public Sub btnOpen_Click()
     
     Dim strFileSize As String
-    Dim artist_x As String
-    Dim title_x As String
     Dim path As String
     Dim strProgram As String
     
@@ -342,7 +362,7 @@ Public Sub UpdatePlayers()
             cmbPlayers.Add(arrstrPlayers[i])
         Endif
     Next
-    
+
 End
 
 Public Sub cmbPlayers_Change()
@@ -351,10 +371,31 @@ Public Sub cmbPlayers_Change()
     Dim arrstrPlayers As String[] = SupportedPlayers()
     Dim arrstrPlayersExecutable As String[] = SupportedPlayersExecutables()
     Dim i As Integer
+    Dim mimetype As String
+    Dim pathToDesktopFile As String
+    Dim isSet As Boolean = False
     
     For i = 0 To arrstrPlayers.Count - 1
         If cmbPlayers.Text = arrstrPlayers[i] Then
-            strCommand = arrstrPlayersExecutable[i]
+            If arrstrPlayersExecutable[i] == "xdg-open" Then
+                
+                Shell "xdg-mime query filetype \"" & Main.filename & "\"" To mimetype
+                Shell "xdg-mime query default " & mimetype To pathToDesktopFile
+                If InStr(pathToDesktopFile, "mpv") > 0 Then
+                    strCommand = "mpv"
+                    isSet = True
+                Endif
+                If InStr(pathToDesktopFile, "vlc") > 0 Then
+                    strCommand = "vlc"
+                    isSet = True
+                Endif
+                If isSet == False Then
+                    strCommand = "xdg-open" 'TODO: fix this (cannot kill xdg-open) can be fixed by reading the desktop file
+                Endif
+            Else
+                strCommand = arrstrPlayersExecutable[i]
+            End If
+            
             Return
         Endif
     Next
@@ -391,26 +432,13 @@ Public Sub btnReloadConfiguration_Click()
 End
 
 Public Sub btnPause_Click()
-
+    
     Dim pathToDesktopFile As String
     Dim mimetype As String
-    Dim realCommand As String
+    Dim realCommand As String = strCommand
     'Shell "file --mime-type \"" & Main.filename & "\"" To mimetype
-
-    If strCommand == "xdg-open" Then
-        Shell "xdg-mime query filetype \"" & Main.filename & "\"" To mimetype
-        Shell "xdg-mime query default " & mimetype To pathToDesktopFile
-        If InStr(pathToDesktopFile, "mpv") > 0 Then
-            realCommand = "mpv"
-        Endif
-        If InStr(pathToDesktopFile, "vlc") > 0 Then
-            realCommand = "vlc"
-        Endif
-    Else
-        realCommand = strCommand
-    Endif
     
-    If realCommand == "mpv" Or realCommand == "vlc" Then
+   If realCommand == "mpv" Or realCommand == "vlc" Then
         If InStr(btnPause.Text, "PAUSED") > 0 Then
             btnPause.Text = "Pause"
             btnAddLine.Enabled = True
@@ -436,4 +464,27 @@ Public Sub btnPause_Click()
         Message("This option can only be used with mpv or VLC Media Player. Please set mpv or VLC Media Player as your player.")
     Endif
     
+End
+
+Public Function ShowMessage(text As String, Optional title As String = "Text2SRT")
+    
+    Shell "notify-send '" & title & "' '" & text & "' --icon=dialog-information"  
+    
+End
+
+
+Public Sub btnTooEarly_Click()
+    Dim lastIndex As Integer = RInStr(txtSRT.Text, "-->")
+    Dim lastTime As String = Mid(txtSRT.Text, lastIndex - 13, 12)
+    
+    txtSRT.Text = Replace(txtSRT.Text, lastTime, TimeCalc.getTime(WhereWereWe()))
+
+End
+
+Public Sub optionsPanel_Click()
+
+    If optionsPanel.Index = 0 Then
+        'tabTools.Hide()
+    Endif
+
 End

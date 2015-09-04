@@ -1,8 +1,9 @@
 Features to be implemented:
 
-verify there is no overlap between subtitles
+verify there is no overlap between subtitles (for category tools)
 installation script
 extend search lyrics support
+check if subtitles already exist, ask what to do
 
 Features implemented:
 Support 6h5m6s notation for length
