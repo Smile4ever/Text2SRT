@@ -4,6 +4,9 @@ verify there is no overlap between subtitles (for category tools)
 installation script
 extend search lyrics support
 check if subtitles already exist, ask what to do
+add line numbers for input textbox
+basic markup for SRT subtitles
+search & replace
 
 Features implemented:
 Support 6h5m6s notation for length
