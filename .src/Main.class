@@ -92,6 +92,7 @@ Public Sub AddSRTItem()
             btnAddLine.Text = "Save SRT"
             btnStart.Text = "Start"
             btnAddPause.Enabled = False
+            lblNextLine.Text = ""
         Else
             UpdateNextUp()
         End If
@@ -435,21 +436,20 @@ Public Sub btnPause_Click()
     
     Dim pathToDesktopFile As String
     Dim mimetype As String
-    Dim realCommand As String = strCommand
     'Shell "file --mime-type \"" & Main.filename & "\"" To mimetype
     
-   If realCommand == "mpv" Or realCommand == "vlc" Then
+   If strCommand == "mpv" Or strCommand == "vlc" Then
         If InStr(btnPause.Text, "PAUSED") > 0 Then
             btnPause.Text = "Pause"
             btnAddLine.Enabled = True
             btnAddPause.Enabled = True
             
-            If realCommand == "vlc" Then
+            If strCommand == "vlc" Then
                 'This will be inaccurate for MPEG-PS, see https://trac.videolan.org/vlc/ticket/6705
                 'start half a second earlier to compensate for the startup time of VLC
                 Shell "vlc" & " --start-time=" & TimeCalc.getSeconds(Split(TimeCalc.getTime(WhereWereWe() - halfasecond), ",")[0]) & " \"" & Dialog.Path & "\""
             Endif
-            If realCommand == "mpv" Then
+            If strCommand == "mpv" Then
                 Shell "mpv" & " --osd-level=2 --start=" & Split(TimeCalc.getTime(WhereWereWe() - halfasecond), ",")[0] & " \"" & Dialog.Path & "\""
             Endif
             timePassed += PausedTimePassed() ' + 90 'Second and a half
@@ -458,7 +458,7 @@ Public Sub btnPause_Click()
             btnPause.Text = "PAUSED at " & Split(TimeCalc.getTime(WhereWereWe()), ",")[0]
             btnAddLine.Enabled = False
             btnAddPause.Enabled = False
-            Shell "pkill " & realCommand
+            Shell "pkill " & strCommand
         Endif
     Else
         Message("This option can only be used with mpv or VLC Media Player. Please set mpv or VLC Media Player as your player.")
@@ -478,13 +478,5 @@ Public Sub btnTooEarly_Click()
     Dim lastTime As String = Mid(txtSRT.Text, lastIndex - 13, 12)
     
     txtSRT.Text = Replace(txtSRT.Text, lastTime, TimeCalc.getTime(WhereWereWe()))
-
-End
-
-Public Sub optionsPanel_Click()
-
-    If optionsPanel.Index = 0 Then
-        'tabTools.Hide()
-    Endif
 
 End
