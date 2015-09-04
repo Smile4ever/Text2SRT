@@ -27,6 +27,7 @@ Public Sub ReloadConfiguration()
     
     UpdateButtons()
     UpdatePlayers()
+    hsplit1.Layout = [45, 55]
     
     'For i = 0 To cmbPlayers.List.Count - 1
     '    If cmbPlayers[i].Text = "mpv" Then 'player-resumer
@@ -136,7 +137,7 @@ Public Sub btnAddPause_Click()
             'strSecondTime = "00:" & TimeCalc.ConvertHTimeToDecimal(txtLength.Text) & ",000"
             Return
         End If
-
+        ScrollDown(lineCounter)
     End If
     
 End
@@ -481,7 +482,7 @@ Public Sub btnTooEarly_Click()
     Dim lastTime As String = Mid(txtSRT.Text, lastIndex - 13, 12)
     
     txtSRT.Text = Replace(txtSRT.Text, lastTime, TimeCalc.getTime(WhereWereWe()))
-    
+    ScrollDown(lineCounter)
 End
 
 Public Sub StopRecording()

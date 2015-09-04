@@ -14,13 +14,6 @@
     MoveScaled(105,1,24,4)
     Text = ("Help and usage")
   }
-  { txtSRT TextArea
-    MoveScaled(51,6,52,61)
-    Expand = True
-  }
-  { txtInputText TextArea
-    MoveScaled(2,6,48,61)
-  }
   { btnOpen Button
     MoveScaled(2,1,16,4)
     Text = ("Open video file")
@@ -40,7 +33,7 @@
       }
       { btnPasteText Button
         MoveScaled(1,7,23,4)
-        Text = ("Paste text from clipboard")
+        Text = ("Paste text")
       }
     }
     { frmPlayback Frame
@@ -146,7 +139,19 @@
     Text = ("Next up:")
   }
   { lblNextLine TextLabel
-    MoveScaled(27.75,0.5,47,5)
+    MoveScaled(28,0.625,47,5)
     Alignment = Align.Left
+  }
+  { HSplit1 HSplit
+    MoveScaled(2,6,103,52)
+    { txtInputText TextArea
+      MoveScaled(0,0,46,52)
+      Wrap = True
+    }
+    { txtSRT TextArea
+      MoveScaled(46,0,47,52)
+      Expand = True
+      Wrap = True
+    }
   }
 }
