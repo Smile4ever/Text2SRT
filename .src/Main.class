@@ -162,7 +162,7 @@ Public Sub btnAddLine_Click()
 End
 
 Public Sub Form_Resize()
-    
+
     Dim minHeight As Integer = 70
     
     txtSRT.Height = Main.Height - minHeight
@@ -201,9 +201,7 @@ Public Sub Form_Resize()
         btnAddPause.X = Main.Width - btnAddLine.Width - btnAddLine.Width - optionsPanel.Width
         btnAddLine.X = Main.Width - btnAddLine.Width - optionsPanel.Width
     Endif
-    
-    ShowMessage(Main.Width)
-    
+
     optionsPanel.Left = Main.Width - optionsPanel.Width
     btnHelp.Left = Main.Width - btnHelp.Width - 20
     hsplit1.Width = Main.Width - optionsPanel.Width - 20
