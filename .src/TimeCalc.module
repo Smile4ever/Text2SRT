@@ -24,8 +24,6 @@ Public Function ConvertHTimeToDecimal(strTime As String, Optional strLeadingZero
     Dim intLocationMinutes As Integer
     Dim intLocationSeconds As Integer
     
-    Dim strTempPartialTime As String
-    Dim intTempPartialTime As Integer
     Dim strRestOfTime As String
     Dim arrstrSplit As String[]
     

@@ -3,6 +3,7 @@
 Public lineCounter As Integer = 0
 Public startTime As Date
 Public emptyLineCounter As Integer = 0
+Public emptyInputLineCounter As Integer = 0
 Public filename As String
 Public strCommand As String
 Public boundary As Integer = 15
@@ -26,7 +27,7 @@ Public Sub ReloadConfiguration()
     
     UpdateButtons()
     UpdatePlayers()
-
+    
     'For i = 0 To cmbPlayers.List.Count - 1
     '    If cmbPlayers[i].Text = "mpv" Then 'player-resumer
     '        cmbPlayers.Index = i
@@ -61,7 +62,7 @@ Public Sub CleanInputText(inputText As String) As String[]
         Endif
     Next
     Return lyricsCleanArrayCleanest
-
+    
 End
 
 Public Sub AddSRTItem()
@@ -71,12 +72,7 @@ Public Sub AddSRTItem()
     Dim lyricsCleanArray As String[] = CleanInputText(txtInputText.Text)
     Dim strSecondTime As String = ".?."
     
-    'ShowMessage(timePassed, "timepassed")
-    'ShowMessage(strTime, "strTime")
-    
     If lineCounter < lyricsCleanArray.Count Then
-        'txtSRT.Text = Replace(txtSRT.Text, "{{NEXT}}", TimeCalc.getTime(strTime))
-        
         txtSRT.Text = Replace(txtSRT.Text, strSecondTime, TimeCalc.getTime(strTime))
         If lineCounter + 1 == lyricsCleanArray.Count Then
             strSecondTime = "00:" & TimeCalc.ConvertHTimeToDecimal(txtLength.Text) & ",000"
@@ -85,21 +81,13 @@ Public Sub AddSRTItem()
         srtItem = (lineCounter + 1) & "\n" & TimeCalc.getTime(strTime) & " --> " & strSecondTime & "\n" & lyricsCleanArray[lineCounter]
         txtSRT.Text &= srtItem & "\n\n"
 
-        lineCounter = lineCounter + 1
+        lineCounter += 1
         If lineCounter == lyricsCleanArray.Count Then
-            'btnTime.Enabled = False
-            Main.Text = "Text2SRT"
-            btnAddLine.Text = "Save SRT"
-            btnStart.Text = "Start"
-            btnAddPause.Enabled = False
-            lblNextLine.Text = ""
+            StopRecording()
         Else
             UpdateNextUp()
         End If
-
-        txtSRT.Line = 4 * (lineCounter + emptyLineCounter + 1)
-        txtInputText.Line = lineCounter + emptyLineCounter + 1
-
+        ScrollDown(lineCounter - 1)
     End If
 
 End
@@ -116,6 +104,23 @@ Public Function WhereWereWe() As Date
     
 End
 
+Public Sub ScrollDown(lineCounter As Integer)
+    Dim countLines As Integer
+    
+    If Trim(Split(txtInputText.Text, "\n")[lineCounter]) == "" Then
+       emptyInputLineCounter += 1
+    Endif
+    
+    countLines = Split(txtSRT.Text, "\n").Count
+    txtSRT.Line = countLines + 1
+    countLines = Split(txtInputText.Text, "\n").Count
+    
+    If lineCounter + emptyInputLineCounter + 3 <> countlines Then
+        txtInputText.Line = lineCounter + emptyInputLineCounter + 2 'See next
+    Endif
+End
+
+
 Public Sub btnAddPause_Click()
     
     'Dim srtItem As String
@@ -124,19 +129,14 @@ Public Sub btnAddPause_Click()
     
     Dim lyricsCleanArray As String[] = Split(strLyricsClean, "\n")
     Dim strSecondTime As String = ".?."
-    
+     
     If lineCounter < lyricsCleanArray.Count Then
         txtSRT.Text = Replace(txtSRT.Text, strSecondTime, TimeCalc.getTime(strTime))
         If lineCounter + 1 == lyricsCleanArray.Count Then
             'strSecondTime = "00:" & TimeCalc.ConvertHTimeToDecimal(txtLength.Text) & ",000"
             Return
         End If
-        
-        emptyLineCounter = emptyLineCounter + 1
-        
-        txtSRT.Line = 4 * (lineCounter + emptyLineCounter + 1)
-        txtInputText.Line = lineCounter + emptyLineCounter + 1
-        
+
     End If
     
 End
@@ -221,7 +221,7 @@ Public Function StartIsValid() As Boolean
 End
 
 Public Sub btnStart_Click()
-
+    
     Dim strOptions As String
     Dim timeNow As Date
     
@@ -246,6 +246,7 @@ Public Sub btnStart_Click()
         btnAddPause.Enabled = True
         btnAddLine.Text = "Add line"
         btnStart.Text = "Restart"
+        emptyInputLineCounter = 0
         btnAddPause.Enabled = True
         UpdateNextUp()
         
@@ -254,11 +255,15 @@ Public Sub btnStart_Click()
 End
 
 Public Sub UpdateNextUp()
-    
-  lblNextLine.Text = CleanInputText(txtInputText.Text)[lineCounter]  
-    
+    'Dim cleanInputText As String[]
+    'cleanInputText = CleanInputText(txtInputText.Text)
+    'If cleanInputText <> Null Then
+    '    lblNextLine.Text = cleanInputText[lineCounter + 1]  
+    'Else
+    '    lblNextLine.Text = ""
+    'Endif
+    lblNextLine.Text = CleanInputText(txtInputText.Text)[lineCounter]
 End
-
 
 Public Sub btnHelp_Click()
     
@@ -363,7 +368,7 @@ Public Sub UpdatePlayers()
             cmbPlayers.Add(arrstrPlayers[i])
         Endif
     Next
-
+    
 End
 
 Public Sub cmbPlayers_Change()
@@ -434,11 +439,9 @@ End
 
 Public Sub btnPause_Click()
     
-    Dim pathToDesktopFile As String
-    Dim mimetype As String
     'Shell "file --mime-type \"" & Main.filename & "\"" To mimetype
     
-   If strCommand == "mpv" Or strCommand == "vlc" Then
+    If strCommand == "mpv" Or strCommand == "vlc" Then
         If InStr(btnPause.Text, "PAUSED") > 0 Then
             btnPause.Text = "Pause"
             btnAddLine.Enabled = True
@@ -472,11 +475,29 @@ Public Function ShowMessage(text As String, Optional title As String = "Text2SRT
     
 End
 
-
 Public Sub btnTooEarly_Click()
+
     Dim lastIndex As Integer = RInStr(txtSRT.Text, "-->")
     Dim lastTime As String = Mid(txtSRT.Text, lastIndex - 13, 12)
     
     txtSRT.Text = Replace(txtSRT.Text, lastTime, TimeCalc.getTime(WhereWereWe()))
+    
+End
 
+Public Sub StopRecording()
+    
+    Main.Text = "Text2SRT"
+    btnAddLine.Text = "Save SRT"
+    btnStart.Text = "Start"
+    btnAddPause.Enabled = False
+    lblNextLine.Text = ""
+    
+End
+
+
+Public Sub btnStopRecording_Click()
+
+    StopRecording()
+    txtSRT.Text = Replace(txtSRT.Text, ".?.", TimeCalc.getTime(TimeCalc.ConvertHTimeToDecimal(txtLength.Text)))
+    Shell "pkill " & strCommand
 End

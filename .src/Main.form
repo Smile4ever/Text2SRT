@@ -135,6 +135,10 @@
       MoveScaled(1,16,24,4)
       Text = ("Restore defaults")
     }
+    { btnStopRecording Button
+      MoveScaled(1,26,24,4)
+      Text = ("Stop recording")
+    }
     Index = 0
   }
   { lblNextUp Label
