@@ -1,0 +1,10 @@
+[Desktop Entry]
+Exec=/usr/lib/text2srt/text2srt.sh
+Icon=none
+Type=Application
+Terminal=false
+Name=Text2SRT
+Categories=Utility;
+Comment=
+Path=
+StartupNotify=true
