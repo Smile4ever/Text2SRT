@@ -73,10 +73,14 @@ Public Sub AddSRTItem()
     Dim lyricsCleanArray As String[] = CleanInputText(txtInputText.Text)
     Dim strSecondTime As String = ".?."
     
+    DebugSRT.Log("We are now at " & strTime & " if we may believe the function WhereWereWe")
+    DebugSRT.Log("TimeCalc.getTime() calculates " & TimeCalc.getTime(strTime) & " for " & strTime)
+       
     If lineCounter < lyricsCleanArray.Count Then
         txtSRT.Text = Replace(txtSRT.Text, strSecondTime, TimeCalc.getTime(strTime))
         If lineCounter + 1 == lyricsCleanArray.Count Then
-            strSecondTime = "00:" & TimeCalc.ConvertHTimeToDecimal(txtLength.Text) & ",000"
+            DebugSRT.Log("For the end time, TimeCalc.ConvertHTimeToDecimal calculates " & TimeCalc.ConvertHTimeToDecimal(txtLength.Text))
+            strSecondTime = TimeCalc.ConvertHTimeToDecimal(txtLength.Text) & ",000"
         End If
 
         srtItem = (lineCounter + 1) & "\n" & TimeCalc.getTime(strTime) & " --> " & strSecondTime & "\n" & lyricsCleanArray[lineCounter]
@@ -279,6 +283,9 @@ Public Sub btnStart_Click()
         txtSRT.Text = ""
         lineCounter = 0
         startTime = timenow
+        
+        DebugSRT.Log("The start time is " & timenow)
+        
         btnPause.Text = "Pause"
         btnAddLine.Enabled = True
         btnAddPause.Enabled = True
@@ -338,6 +345,9 @@ Public Sub btnOpen_Click()
         strProgram = "ffmpeg"
     Endif
     Shell strProgram & " -i \"" & Dialog.Path & "\" 2>&1 | grep Duration | cut -d ' ' -f 4 | sed s/,//" To strFileSize
+    DebugSRT.Log("------------------------------------------")
+    DebugSRT.Log("Opened the file " & Dialog.Path)
+    DebugSRT.Log("The program " & strProgram & " has calculated the length " & strFileSize)
     txtLength.Text = Mid(strFileSize, 1, 8)
     filename = Dialog.Path
     
@@ -551,4 +561,12 @@ Public Sub btnOptions_Click()
         hsplit1.Width = Main.Width - 20
         optionsPanel.Width = 0
     Endif
+End
+
+Public Sub Form_KeyRelease()
+
+    If Key.Code = Key.F12 Then
+        DebugSRT.Show()
+    Endif
+
 End

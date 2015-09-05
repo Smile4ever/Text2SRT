@@ -8,6 +8,9 @@ add line numbers for input textbox
 basic markup for SRT subtitles
 search & replace
 
+Bugs:
+http://www.metrolyrics.com/i'm-not-scared-lyrics-eighth-wonder.html is rejected
+
 Features implemented:
 Support 6h5m6s notation for length
 use xdg-open to open video files

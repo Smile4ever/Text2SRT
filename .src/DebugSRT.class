@@ -1,0 +1,51 @@
+' Gambas class file
+
+Public strLast As String
+
+Public Sub Form_Open()
+
+ 
+
+End
+
+Public Function GetTime() As String
+
+  Dim strTime As String = CStr(Time(Now))
+
+  Return Mid(strTime, 1, InStr(strTime, ".") - 1)
+
+End
+
+Public Sub Log(strMessage As String)
+  Dim intLength As Integer
+  Dim strTime As String
+  
+  strTime = GetTime()
+
+  'Flood prevention
+  intLength = Len(strLast) - 1
+  If Len(strMessage) < intLength Then
+    intLength = Len(strMessage) - 1
+  Endif
+
+  If Mid(strTime & " " & strMessage, 9, intLength) = Mid(strLast, 9, intLength) And Trim(strMessage) <> "" Then
+
+  Else
+      If Mid(strMessage, 1, 8) == "--------" Then
+           strLast = strMessage & "\n"
+           txtDebug.Text &= strLast
+      Else
+        strLast = strTime & " " & strMessage & "\n"
+        txtDebug.Text &= strLast
+        Print "[Debug] " & strTime & " " & strMessage
+      End If
+  Endif
+
+End
+
+Public Sub Form_Resize()
+
+    txtDebug.Width = DebugSRT.Width - 10
+    txtDebug.Height = DebugSRT.Height - 10
+
+End
