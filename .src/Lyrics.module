@@ -17,203 +17,32 @@
 Public title_x As String
 'Public artist_x As String = "Fleetwood Mac"
 Public artist_x As String
+Public filename As String
 
-Public Sub init()
-    
-    title_x = get_title()
-    artist_x = get_artist()  
-    
+Public Function get_lyrics(filenamelocal As String) As String
+    filename = getCleanFilename(filenamelocal)
+    Return fetch_lyrics()
 End
 
-Public Function get_lyrics() As String
-    
-    Dim original_title As String
-    Dim artist_metro As String
-    Dim metrotitle As String
-    Dim url As String
-    Dim lyric_string As String
-    'Dim isLyricsMode As Boolean = False
-    Dim artist_and_location As Integer
-    Dim metrourl As String
-    Dim tried_together_and As Boolean
-    Dim tried_together_withdash As Boolean
-    Dim new_artist_metro As String
-    Dim first_artist_url As String
-    
-    If title_x == "" Or artist_x == "" Then
-        Return ""
-    End If
-    
-    title_x = Trim(title_x)
-    artist_x = Trim(artist_x)
-    
-    title_x = Replace(title_x, " ", "_")
-    artist_x = Replace(artist_x, " _ ", " and ") 'Womack _ Womack - Friends
-    artist_x = Replace(artist_x, " ", "_")
-    
-    title_x = LCase(title_x)
-    artist_x = LCase(artist_x)
-    
-    title_x = Replace(title_x, "-", "_")
-    original_title = title_x
-    title_x = Replace(title_x, "[^%w_]", "") 'TODO: fix this
-    title_x = Replace(title_x, "&", "and")
-    artist_x = Replace(artist_x, "&", "and")
-    'artist_x = Replace(artist_x, "_&_", "_and_")
-    artist_x = Replace(artist_x, "_&_", "_")
-    artist_x = Replace(artist_x, ".", "")
-    artist_x = Replace(artist_x, "ó", "o") 'Róisín Murphy
-    artist_x = Replace(artist_x, "í", "i") 'Róisín Murphy
-    
-    artist_metro = Replace(artist_x, "-", "") 'a-ha is aha on metro lyrics, but a_ha on lyrics mode
-    artist_metro = Replace(artist_metro, "_", "-")
-    
-    artist_x = Replace(artist_x, "-", "_")
-    'artist_x = Replace(artist_x, "[^%w_]","") --TODO: fix this
-    
-    metrotitle = Replace(title_x, "_", "-")
-    
-    url = ""
-    lyric_string = ""
-    'isLyricsMode = False
-    
-    If is_lyric_page(lyric_string) == False Then        
-        metrourl = "http://www.metrolyrics.com/" & metrotitle & "-lyrics-" & artist_metro & ".html"
-        'lyric_string = fetch_lyrics(metrourl)
-        
-        artist_and_location = InStr(artist_metro, "-and-")
-        
-        If artist_and_location > 0 Then
-            artist_and_location = InStr(artist_metro, "and", artist_and_location - 2)
-            If artist_and_location > 0 Then
-                If is_lyric_page(lyric_string) == False Then
-                    'vlc.msg.dbg("location:"..string.len(artist_metro) - artist_and_location)
-                    If string.len(artist_metro) - artist_and_location < 14 Then
-                        'quick code path to reduce the number of false tries
-                        'probably not two separate artists, but one With a & in the name
-                        'together
-                        lyric_string = fetch_lyrics(metrourl)
-                        tried_together_and = True
-                        
-                        If is_lyric_page(lyric_string) == False Then
-                            'together with a dash
-                            new_artist_metro = Mid(artist_metro, 1, artist_and_location - 2) & "-" & Mid(artist_metro, artist_and_location + 4)
-                            url = "http://www.metrolyrics.com/" & metrotitle & "-lyrics-" & new_artist_metro & ".html" 'must be the same as above (except for the new_)
-                            lyric_string = fetch_lyrics(url)
-                            tried_together_withdash = True
-                        End If
-                    End If
-                End If
-                
-                If is_lyric_page(lyric_string) == False Then
-                    'first artist
-                    new_artist_metro = Mid(artist_metro, 1, artist_and_location - 2)
-                    url = "http://www.metrolyrics.com/" & metrotitle & "-lyrics-" & new_artist_metro & ".html" 'must be the same As Above(except For the new_)
-                    first_artist_url = url
-                    lyric_string = fetch_lyrics(url)
-                End If
-                If is_lyric_page(lyric_string) == False Then
-                    'second artist
-                    new_artist_metro = Mid(artist_metro, artist_and_location + 4)
-                    url = "http://www.metrolyrics.com/" & metrotitle & "-lyrics-" & new_artist_metro & ".html" 'must be the same as above (except for the new_)
-                    If first_artist_url == url Then
-                        'do nothing
-                    Else
-                        lyric_string = fetch_lyrics(url)
-                    End If
-                End If
-                
-                If is_lyric_page(lyric_string) == False And tried_together_withdash == False Then
-                    'together with a dash
-                    new_artist_metro = Mid(artist_metro, 1, artist_and_location - 2) & "-" & Mid(artist_metro, artist_and_location + 4)
-                    url = "http://www.metrolyrics.com/" & metrotitle & "-lyrics-" & new_artist_metro & ".html" 'must be the same as above (except for the new_)
-                    lyric_string = fetch_lyrics(url)
-                End If
-                If is_lyric_page(lyric_string) == False Then
-                    'try again without and between artists
-                    new_artist_metro = Mid(artist_metro, 1, artist_and_location - 2) & Mid(artist_metro, artist_and_location + 4)
-                    url = "http://www.metrolyrics.com/" & metrotitle & "-lyrics-" & new_artist_metro & ".html" 'must be the same as above(except for the new_)
-                    lyric_string = fetch_lyrics(url)
-                End If
-                
-                If is_lyric_page(lyric_string) == False And tried_together_and == False Then
-                    'together
-                    lyric_string = fetch_lyrics(metrourl)
-                End If
-            End If
-        Else
-            lyric_string = fetch_lyrics(metrourl)
-            If is_lyric_page(lyric_string) == False And InStr(artist_metro, "the-") Then
-                new_artist_metro = Replace(artist_metro, "the-", "")
-                lyric_string = fetch_lyrics("http://www.metrolyrics.com/" & metrotitle & "-lyrics-" & new_artist_metro & ".html")
-            End If
-        End If
-        
-        'source_label: set_text("MetroLyrics")
-        'isLyricsMode = False;
-    End If
-    'best coverage, but a bit slow To put first
-    If is_lyric_page(lyric_string) == False Then
-        url = "http://sonichits.com/video/" & artist_x & "/" & Replace(original_title, "-", "_")
-        lyric_string = fetch_lyrics(url)
-        'source_label: set_text("Sonic Hits")
-        'isLyricsMode = False
-    End If
-    
-    Return lyric_string
-    
-End
-
-Function is_lyric_page(lyric_string As String) As Boolean
-    
-    If lyric_string == "" Then
-        Return False
-    End If
-    
-    If Len(lyric_string) < 40 Then
-        'Debug
-        Return False
-    End If
-    
-    If InStr(lyric_string, "We are not in a position to display these lyrics due to licensing restrictions. Sorry for the inconvenience.") > 0 Then
-        Return False
-    End If
-    
-    If InStr(lyric_string, "Select your carrier...") > 0 Then
-        'low quality lyrics
-        Return False
-    End If
-    
-    If InStr(lyric_string, "No lyrics found for this song") > 0 Then
-        'If debug_enabled Then
-        '    vlc.msg.dbg("[Lyrics Finder] Data dump: "..lyric_string)
-        'End
-        Return False
-    End If
-    
-    Return True
-    
-End
-
-Function fetch_lyrics(url As String) As String
+Function fetch_lyrics() As String
     
     Dim Client As New HttpClient
     Dim data As String
-    Dim a As Integer
-    Dim b As Integer
-    Dim endofstring As String
-    Dim position As Integer
+    Dim apiurl As String
     
-    Dim metro_pos As Integer
-    Dim sonichits As Integer
+    'Url
+    filename = Replace(filename, " ", "%20")
+    filename = Replace(filename, "&", "and")
+    'filename = Replace(filename, "&", "%26")
+    'filename = Replace(filename, "'", "%27")
     
-    Dim newlinestring As String
-    
-    Client.URL = url
+    apiurl = "http://hugsmile.eu/lyricscore/api/v1/?filename=" & filename & "&format=text"
+
+    Client.URL = apiurl
     Client.Async = False
     'Client.Timeout = intTimeOut
     Client.UserAgent = "text2srt"
-    Print "Fetch " & url
+    Print "Fetch " & apiurl
     Client.Get()
     
     If Client.Status < 0 Then
@@ -221,83 +50,7 @@ Function fetch_lyrics(url As String) As String
     Else
         If Lof(Client) Then data = Read #Client, Lof(Client)
         
-        metro_pos = InStr(url, "metrolyrics")
-        sonichits = InStr(url, "sonichits")
-        
-        'data = string.gsub(data, "&#(%d+)", string.char);
-        
-        If metro_pos > 0 Then
-            'MetroLyrics
-            'local _, a = string.find(data, '<div id="lyrics-body-text">')
-            
-            data = Replace(data, "<br/>", "")
-            data = Replace(data, "</p>", "")
-            data = Replace(data, "<p class='verse'>", "\n\n")
-            data = Trim(data)
-            
-            a = InStr(data, "lyrics-body-text", 1)
-            
-            If a == 0 Then
-                Return ""
-            End If
-            
-            endofstring = ">"
-            position = InStr(data, endofstring, a)
-            If position == 0 Then
-                Return ""
-            End If
-            
-            b = InStr(data, "</div>", a)
-            
-            'page does not contain lyrics
-            If b == 0 Then
-                Return ""
-            End If
-            Return Mid(data, position + 4, b - position - 5) 'Lua uses :sub which uses begin and end. Gambas uses begin and length
-        End If
-        
-        If sonichits Then
-            a = InStr(data, "<div id=\"lyrics\"")
-            
-            If a == 0 Then
-                Return ""
-            End If
-            
-            endofstring = "<br>"
-            position = InStr(data, endofstring, a)
-            
-            If position == 0 Then
-                Return ""
-            End If
-            
-            position = InStr(data, endofstring, position + 1)
-            If position == 0 Then
-                Return ""
-            End If
-            
-            b = InStr(data, "Contributed by", a)
-            If b == 0 Then
-                b = InStr(data, "Lyrics", a)
-            End If
-            
-            If b == 0 Then
-                b = InStr(data, "</div>", a)
-            Else
-                b = InStr(data, "<br>", b - 10)
-            End If
-            
-            data = Replace(data, "\r", "\n")
-            
-            If b == 0 Then
-                Return ""
-            End If
-            If InStr(data, "<br>\n") == 0 Then
-                newlinestring = "\n"
-            Else
-                newlinestring = ""
-            Endif
-            Return Replace(Mid(data, position + 4, b - position), "<br>", newlinestring)
-        End If
+       
         
     End If
     
@@ -305,77 +58,6 @@ Function fetch_lyrics(url As String) As String
     
 End
 
-Public Function get_artist() As String
-    'TODO: implement metadata reading
-    
-    Dim filename As String
-    Dim hyphenpos As Integer
-    Dim hyphenpostwo As Integer
-    Dim spacepos As Integer
-    Dim oldpos As Integer
-    Dim amount As Integer
-    Dim space_after_pos As Integer
-    
-    'unknown metadata, make a guess
-    'filename = string.gsub(name, "^(.+)%.%w+$", "%1")
-    filename = Main.filename
-    hyphenpos = InStr(filename, "-")
-    
-    filename = getCleanFilename(filename)
-    filename = Replace(filename, "&", "and") 'replace & by and
-    filename = Replace(filename, " _ ", " and ") 'replace underscore with spaces by and
-    
-    spacepos = InStr(filename, " ")
-    hyphenpos = InStr(filename, "-")
-    
-    If spacepos == 0 Then
-        'Return "notok"
-        'spacepos = 0
-    End If
-    
-    If hyphenpos == 0 Then
-        Return "" 'invalid things
-    End If
-    
-    If spacepos == 0 Then
-        Return "" 'invalid things (for example "-IRememberYou")
-    End If
-    
-    If hyphenpos < spacepos Then
-        oldpos = hyphenpos
-        hyphenpos = InStr(filename, "-", spacepos) 'was not the right hyphen (a-ha)
-        
-        If hyphenpos == 0 Then
-            hyphenpos = oldpos
-        End If
-    Else
-        spacepos = InStr(filename, " ", hyphenpos - 2)
-    End If
-    filename = Replace(filename, "ft..*", "") 'remove ft.
-    filename = Replace(filename, "feat..*", "") 'remove feat.
-    
-    amount = 2
-    space_after_pos = InStr(filename, " ", hyphenpos)
-    
-    If space_after_pos == 0 Then
-        'no space after hyphenpos(Artist - Title)
-        amount = 1
-    Else
-        'space after hyphenpos(Artist - Title)
-        'equal To Or greather than(was space_after_pos > hyphenpos + 1)
-        If space_after_pos > hyphenpos - 1 Then
-            amount = 1
-        End If
-    End If
-    
-    hyphenpostwo = InStr(filename, "-", hyphenpos + 1)
-    If hyphenpostwo == 0 Then
-        Return Mid(filename, 1, hyphenpos - amount)
-    Else
-        Return Mid(filename, 1, hyphenpostwo - amount) 'Olivia Newton-John
-    End If
-    
-End
 
 Public Function getCleanFilename(filename As String) As String
     
@@ -391,78 +73,5 @@ Public Function getCleanFilename(filename As String) As String
     filename = Mid(filename, 1, locationparenthesis - 1)
     
     Return filename
-    
-End
-
-Public Function get_title() As String
-    
-    Dim filename As String
-    Dim pos As Integer
-    Dim spacepos As Integer
-    Dim oldpos As Integer
-    Dim parpos As Integer
-    Dim hyphenpostwo As Integer
-    Dim amount As Integer
-    Dim space_after_pos As Integer
-    
-    filename = Main.filename
-    filename = getCleanFilename(filename)
-    'filename = string.gsub(filename, "^(.+)%.%w+$", "%1")
-    pos = InStr(filename, "-")
-    spacepos = InStr(filename, " ")
-    
-    If pos == 0 Then
-        Return "" 'invalid things
-    End If
-    
-    If spacepos == 0 Then
-        Return "" 'invalid things (for example "-IRememberYou")
-    End If
-    
-    If pos < spacepos Then
-        oldpos = pos
-        pos = InStr(filename, "-", spacepos)
-        If pos == 0 Then
-            pos = oldpos
-        End If
-    End If
-    
-    parpos = InStr(filename, "(")
-    If parpos == 0 Then
-        parpos = Len(filename) + 2
-        
-    End If
-    
-    filename = Replace(filename, " - Lyrics", "")
-    
-    hyphenpostwo = InStr(filename, "-", pos + 1)
-    If hyphenpostwo > 0 Then
-        pos = hyphenpostwo 'Olivia Newton-John
-    End If
-    
-    amount = 2
-    space_after_pos = InStr(filename, " ", pos)
-    If space_after_pos == 0 Then
-        'no space after pos
-        amount = 1
-    Else
-        
-        'was + 1
-        If space_after_pos > pos - 1 Then
-            amount = 1
-            
-        End If
-        
-        filename = Mid(filename, pos + amount, parpos - amount)
-        filename = Replace(filename, " Lyrics", "")
-        'filename = string.gsub(filename, "ft..*", "") 'remove featuring '(TODO: If Title - Author gets implemented, make this more robuust)
-        'filename = string.gsub(filename, "feat..*", "") 'remove featuring '(TODO: If Title - Author gets implemented, make this more robuust)
-        'filename = string.gsub(filename, "@.*", "")
-        'filename = string.gsub(filename, " with Lyrics", "") 'remove With lyrics
-        filename = Replace(filename, "_ll", "'ll") 'remove With lyrics
-        
-        Return Trim(filename)  
-        
-    End If
     
 End

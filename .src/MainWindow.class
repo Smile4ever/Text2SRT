@@ -10,6 +10,7 @@ Public boundary As Integer = 15
 Public pauseTimeStart As Date
 Public timePassed As Date
 Public halfasecond As Date
+Public timeoptionschanged As Date
 
 Public Sub _new()
     
@@ -23,6 +24,7 @@ End
 
 Public Sub ReloadConfiguration()
     
+    Dim tempDate As Date
     'Dim i As Integer
     
     UpdateButtons()
@@ -35,6 +37,9 @@ Public Sub ReloadConfiguration()
     '    Endif
     'Next
     cmbPlayers.Index = 0
+    
+    tempDate = Now
+    timePassed = tempDate - tempDate
     
 End
 
@@ -73,13 +78,18 @@ Public Sub AddSRTItem()
     Dim lyricsCleanArray As String[] = CleanInputText(txtInputText.Text)
     Dim strSecondTime As String = ".?."
     
-    DebugSRT.Log("We are now at " & strTime & " if we may believe the function WhereWereWe")
-    DebugSRT.Log("TimeCalc.getTime() calculates " & TimeCalc.getTime(strTime) & " for " & strTime)
+    If Trim(txtLength.Text) == "" Then
+        ShowMessage("The audio length should be set")
+        Return
+    Endif
+    
+    DebugWindow.Log("We are now at " & strTime & " if we may believe the function WhereWereWe")
+    DebugWindow.Log("TimeCalc.getTime() calculates " & TimeCalc.getTime(strTime) & " for " & strTime)
        
     If lineCounter < lyricsCleanArray.Count Then
         txtSRT.Text = Replace(txtSRT.Text, strSecondTime, TimeCalc.getTime(strTime))
         If lineCounter + 1 == lyricsCleanArray.Count Then
-            DebugSRT.Log("For the end time, TimeCalc.ConvertHTimeToDecimal calculates " & TimeCalc.ConvertHTimeToDecimal(txtLength.Text))
+            DebugWindow.Log("For the end time, TimeCalc.ConvertHTimeToDecimal calculates " & TimeCalc.ConvertHTimeToDecimal(txtLength.Text))
             strSecondTime = TimeCalc.ConvertHTimeToDecimal(txtLength.Text) & ",000"
         End If
 
@@ -104,8 +114,11 @@ Public Function PausedTimePassed() As Date
 End
 
 Public Function WhereWereWe() As Date
-    
-    Return Now - startTime - timePassed
+    DebugWindow.Log("Starttime is " & startTime)
+    DebugWindow.Log("now is " & Now)
+    DebugWindow.Log("timepassed is " & timePassed)
+    Return Now - startTime
+    ' - timePassed
     
 End
 
@@ -169,10 +182,10 @@ Public Sub Form_Resize()
 
     Dim minHeight As Integer = 70
     
-    txtSRT.Height = Main.Height - minHeight
-    txtInputText.Height = Main.Height - minHeight
-    optionsPanel.Height = Main.Height - minHeight
-    HSplit1.Height = Main.Height - minHeight
+    txtSRT.Height = MainWindow.Height - minHeight
+    txtInputText.Height = MainWindow.Height - minHeight
+    optionsPanel.Height = MainWindow.Height - minHeight
+    HSplit1.Height = MainWindow.Height - minHeight
 
     btnHelp.Text = "Help and usage"
     btnHelp.Width = 192
@@ -184,38 +197,43 @@ Public Sub Form_Resize()
     lblNextUp.Visible = True
     btnOptions.Visible = False
 
-    If Main.Width < 900 Then
+    lblNextLine.Width = btnAddPause.ScreenX - 30 - lblNextLine.ScreenX 
+
+    If Me.Width < 900 Then
         btnHelp.Width = 60
         btnHelp.Text = "Help"
-        btnAddPause.X = Main.Width - 210 - btnHelp.Width
-        btnAddLine.X = Main.Width - 120 - btnHelp.Width  '       
-            '
-        If Main.Width < 800 Then
+        btnAddPause.X = Me.Width - 210 - btnHelp.Width
+        btnAddLine.X = Me.Width - 120 - btnHelp.Width  '       
+        
+        If Me.Width < 700 Then
+            Toggle_Options(False)
             btnHelp.Visible = False
-            btnAddPause.X = Main.Width - 190
-            btnAddLine.X = Main.Width - 100
-        Endif
-
-        If Main.Width < 550 Then
-            lblNextUp.Visible = False
-            lblNextLine.Visible = False
+            'btnAddPause.X = Main.Width - 190
+            'btnAddLine.X = Main.Width - 100
+            btnOptions.Move(btnHelp.X, btnHelp.Y)
             btnOptions.Visible = True
         Endif
-    Else
-        btnAddPause.X = Main.Width - btnAddLine.Width - btnAddLine.Width - optionsPanel.Width
-        btnAddLine.X = Main.Width - btnAddLine.Width - optionsPanel.Width
-    Endif
 
-    optionsPanel.Left = Main.Width - optionsPanel.Width
-    btnHelp.Left = Main.Width - btnHelp.Width - 20
-    hsplit1.Width = Main.Width - optionsPanel.Width - 20
+        If Me.Width < 550 Then
+            lblNextUp.Visible = False
+            lblNextLine.Visible = False
+            
+        Endif
+    Else
+        btnAddPause.X = Me.Width - btnAddLine.Width - btnAddLine.Width - optionsPanel.Width
+        btnAddLine.X = Me.Width - btnAddLine.Width - optionsPanel.Width
+    Endif
+    
+    optionsPanel.Left = Me.Width - optionsPanel.Width
+    btnHelp.Left = Me.Width - btnHelp.Width - 20
+    hsplit1.Width = Me.Width - optionsPanel.Width - 20
     
 End
 
 Public Function StartIsValid() As Boolean
     
     Dim intMinuteLength As Integer
-    
+        
     If txtLength.Text = "" Then
         Message("Length is required. For more information, see Help and Usage.")
         Return False
@@ -234,8 +252,8 @@ Public Function StartIsValid() As Boolean
         Endif
         If rdbLyricsSearch.Value = True Then
             'search lyrics here
-            Lyrics.init()
-            txtInputText.Text = Lyrics.get_lyrics()
+            
+            txtInputText.Text = Lyrics.get_lyrics(filename)
             If txtInputText.Text = "" Then
                 Message("Lyrics not found with automatic searching. Try the auto paste or manual mode.")
                 Return False
@@ -279,12 +297,16 @@ Public Sub btnStart_Click()
         Wait 0.5
         timenow = Time(Now)
         halfasecond = timenow - halfasecond
-        Main.Text = "Text2SRT [Recording " & filename & "]"
-        txtSRT.Text = ""
+        Me.Text = "Text2SRT [Recording " & filename & "]"
+        If Not InStr(txtSRT.Text, ".?.") Then
+            txtSRT.Text = ""
+        Else
+            'set pointer correctly
+        Endif
         lineCounter = 0
         startTime = timenow
         
-        DebugSRT.Log("The start time is " & timenow)
+        DebugWindow.Log("The start time is " & timenow)
         
         btnPause.Text = "Pause"
         btnAddLine.Enabled = True
@@ -293,26 +315,33 @@ Public Sub btnStart_Click()
         btnStart.Text = "Restart"
         emptyInputLineCounter = 0
         btnAddPause.Enabled = True
-        UpdateNextUp()
-        
+        txtInputText.Line = 0
     End If
     
 End
 
 Public Sub UpdateNextUp()
-    'Dim cleanInputText As String[]
-    'cleanInputText = CleanInputText(txtInputText.Text)
-    'If cleanInputText <> Null Then
-    '    lblNextLine.Text = cleanInputText[lineCounter + 1]  
-    'Else
-    '    lblNextLine.Text = ""
-    'Endif
-    lblNextLine.Text = CleanInputText(txtInputText.Text)[lineCounter]
+    
+    'limit text length
+    Dim nextUp As String = CleanInputText(txtInputText.Text)[lineCounter]
+    Dim textLength As Integer = lblNextLine.Width / 6.65 '6.65 is char width
+    Dim spacepos As Integer
+    Dim shortenedText As String
+    
+    shortenedText = Mid(nextUp, 1, textLength)
+    spacepos = RInStr(shortenedText, " ")
+    
+    If textLength < Len(nextUp) Then
+        
+        nextUp = Mid(nextUp, 1, spacepos) & ".." 'break on a space
+    Endif
+    
+    lblNextLine.Text = nextUp
 End
 
 Public Sub btnHelp_Click()
     
-    Help.Show()
+    HelpWindow.Show()
     
 End
 
@@ -344,17 +373,24 @@ Public Sub btnOpen_Click()
     Else
         strProgram = "ffmpeg"
     Endif
-    Shell strProgram & " -i \"" & Dialog.Path & "\" 2>&1 | grep Duration | cut -d ' ' -f 4 | sed s/,//" To strFileSize
-    DebugSRT.Log("------------------------------------------")
-    DebugSRT.Log("Opened the file " & Dialog.Path)
-    DebugSRT.Log("The program " & strProgram & " has calculated the length " & strFileSize)
-    txtLength.Text = Mid(strFileSize, 1, 8)
+   
     filename = Dialog.Path
+    If InStr(filename, ".srt") > 0 Then
+        ShowMessage("Please do not open the SRT file, but the video to be subtitled")
+        Return
+    Endif
+      
+    Shell strProgram & " -i " & Shell$(Dialog.Path) & " 2>&1 | grep Duration | cut -d ' ' -f 4 | sed s/,//" To strFileSize
+    DebugWindow.Log("------------------------------------------")
+    DebugWindow.Log("Opened the file " & Dialog.Path)
+    DebugWindow.Log("The program " & strProgram & " has calculated the length " & strFileSize)
+    txtLength.Text = Mid(strFileSize, 1, 8)
+    
     
     btnStart_Click()
     
-Catch
-    Message.Info(Error.Text)
+'Catch
+    'Message.Info(Error.Text)
     
 End
 
@@ -433,7 +469,7 @@ Public Sub cmbPlayers_Change()
         If cmbPlayers.Text = arrstrPlayers[i] Then
             If arrstrPlayersExecutable[i] == "xdg-open" Then
                 
-                Shell "xdg-mime query filetype \"" & Main.filename & "\"" To mimetype
+                Shell "xdg-mime query filetype \"" & Me.filename & "\"" To mimetype
                 Shell "xdg-mime query default " & mimetype To pathToDesktopFile
                 If InStr(pathToDesktopFile, "mpv") > 0 Then
                     strCommand = "mpv"
@@ -526,15 +562,19 @@ End
 Public Sub btnTooEarly_Click()
 
     Dim lastIndex As Integer = RInStr(txtSRT.Text, "-->")
-    Dim lastTime As String = Mid(txtSRT.Text, lastIndex - 13, 12)
+    Dim lastTime As String
+    If txtSRT.Length > 20 Then
+        lastTime = Mid(txtSRT.Text, lastIndex - 13, 12)
     
-    txtSRT.Text = Replace(txtSRT.Text, lastTime, TimeCalc.getTime(WhereWereWe()))
-    ScrollDown(lineCounter)
+        txtSRT.Text = Replace(txtSRT.Text, lastTime, TimeCalc.getTime(WhereWereWe()))
+        ScrollDown(lineCounter)
+    Endif
+    
 End
 
 Public Sub StopRecording()
     
-    Main.Text = "Text2SRT"
+    Me.Text = "Text2SRT"
     btnAddLine.Text = "Save SRT"
     btnStart.Text = "Start"
     btnAddPause.Enabled = False
@@ -551,22 +591,98 @@ Public Sub btnStopRecording_Click()
 End
 
 Public Sub btnOptions_Click()
+    Toggle_Options()
+   
+End
 
-    optionsPanel.Visible = Not optionsPanel.Visible
+Public Sub Toggle_Options(Optional show As Boolean = Not optionsPanel.Visible)
+    
+     optionsPanel.Visible = show
     If optionsPanel.Visible Then
-        optionsPanel.Width = Main.Width - 20
+        optionsPanel.Width = Me.Width - 20
         optionsPanel.X = 10
         hsplit1.Width = 0
     Else
-        hsplit1.Width = Main.Width - 20
+        hsplit1.Width = Me.Width - 20
         optionsPanel.Width = 0
     Endif
+    
 End
+
 
 Public Sub Form_KeyRelease()
 
     If Key.Code = Key.F12 Then
-        DebugSRT.Show()
+        DebugWindow.Show()
     Endif
+
+End
+
+Public Sub optionsPanel_Click()
+    timeoptionschanged = Now
+    
+End
+
+Public Sub optionsPanel_MouseUp()
+    'Executed after _click
+    
+    'Message("It is now " & TimeCalc.getTime(Time(Now)))
+    'Message("It was " & TimeCalc.getTime(timeoptionschanged))
+    If TimeCalc.getTime(Time(Now)) == TimeCalc.getTime(timeoptionschanged) Then
+        ShowMessage("ander item" & optionsPanel.Index)
+    Else
+        optionsPanel.Width = 29
+        optionsPanel.AutoResize = True
+        Form_Resize()
+    Endif
+
+End
+
+Public Sub submenuOpen_Click()
+
+    btnOpen_Click()
+
+End
+
+Public Sub submenuSearchAndReplace_Click()
+
+    SearchAndReplace.Show()
+
+End
+
+Public Sub getInputText() As String
+
+  Return txtInputText.Text
+
+End
+
+Public Sub setInputText(text As String)
+
+  txtInputText.Text = text 
+
+End
+
+Public Sub getOutputText() As String
+
+  Return txtSRT.Text
+
+End
+
+Public Sub setOutputText(text As String)
+
+  txtSRT.Text = text 
+
+End
+
+
+Public Sub submenuHelpAndUsage_Click()
+
+    HelpWindow.Show
+
+End
+
+Public Sub txtInputText_Change()
+
+    UpdateNextUp()
 
 End

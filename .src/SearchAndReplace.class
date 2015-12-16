@@ -1,0 +1,44 @@
+' Gambas class file
+
+Public Sub btnReplaceAll_Click()
+    
+    Dim contents As String
+    
+    If rdbInputText.Value == True Then
+        contents = MainWindow.getInputText()
+    Else
+        contents = MainWindow.getOutputText()
+    Endif
+    
+    If Len(contents) > 0 Then
+        contents = Replace(contents, txtFind.Text, txtReplace.Text)
+        MainWindow.ShowMessage(txtFind.Text & " => " & txtReplace.Text, "Text replaced")
+        
+        If rdbInputText.Value == True Then
+            MainWindow.setInputText(contents)
+        Else
+            MainWindow.setOutputText(contents)
+        Endif
+        
+        Me.Close
+    Else
+        MainWindow.ShowMessage("There is no text to do a replacement")
+    End If
+    
+End
+
+Public Sub Form_Open()
+    
+    txtFind.SetFocus()
+    
+End
+
+Public Sub Form_KeyRelease()
+
+    If Key.Code = Key.Esc Then
+        Me.Close
+    Endif
+    If Key.Code = Key.Enter Or Key.Code = Key.Return Then
+        btnReplaceAll_Click()
+    Endif
+End

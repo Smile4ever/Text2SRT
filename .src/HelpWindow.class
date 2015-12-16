@@ -19,12 +19,12 @@ Public Sub lstFileName_Select()
         "<b>Step 1: Setting the options</b><br>" &
         "In the right panel, choose which kind (movie, music video) you want to " &
         "subtitle. Now, choose the way you will provide the input text (movie text or lyrics):<br><br>" & 
-        "Movie (length &gt; " & Main.boundary & " minutes)<br> " & ""
+        "Movie (length &gt; " & MainWindow.boundary & " minutes)<br> " & ""
         "- Auto paste movie text (default): this option requires that you copy the movie text " &
         "to the clipboard before going to Step 2." & "<br>" &
         "- Manual paste: this option requires that you copy the movie text to the clipboard " &
         "and paste it in the left textbox before going to Step 2." & "<br><br>" &
-        "Music videos (length &lt; " & Main.boundary & " minutes)" & "<br>" &
+        "Music videos (length &lt; " & MainWindow.boundary & " minutes)" & "<br>" &
         "- Search lyrics (default): try to find the lyrics based on the file name (click at " &
         "your left on \"File name\" for all requirements)" & "<br>" &
         "- Auto paste lyrics: this option will paste the lyrics from the clipboard. Make you sure you copied them from somewhere else " & 
@@ -58,5 +58,13 @@ End
 Public Sub Form_Open()
 
     lstFileName.Index = 0
+
+End
+
+Public Sub Form_KeyRelease()
+
+    If Key.Code = Key.Esc Then
+        Me.Close
+    Endif
 
 End

@@ -2,6 +2,27 @@
 
 { Form Form
   MoveScaled(0,0,148,68)
+  { menuFile Menu
+    Text = ("File")
+    { submenuOpen Menu
+      Text = ("Open video file")
+      Shortcut = "Ctrl+O"
+    }
+  }
+  { menuTools Menu
+    Text = ("Tools")
+    { submenuSearchAndReplace Menu
+      Text = ("Search and replace")
+      Shortcut = "Ctrl+R"
+    }
+  }
+  { menuHelp Menu
+    Text = ("Help")
+    { submenuHelpAndUsage Menu
+      Text = ("Help and usage")
+      Shortcut = "F1"
+    }
+  }
   { btnAddPause Button
     MoveScaled(76,1,13,4)
     Text = ("Add pause")
@@ -45,6 +66,7 @@
       }
       { btnPause Button
         MoveScaled(1,7,23,4)
+        Enabled = False
         Text = ("Pause")
       }
       { cmbPlayers ComboBox
@@ -138,10 +160,6 @@
     MoveScaled(19,1,8,4)
     Text = ("Next up:")
   }
-  { lblNextLine TextLabel
-    MoveScaled(28,0.625,47,5)
-    Alignment = Align.Left
-  }
   { HSplit1 HSplit
     MoveScaled(2,6,103,52)
     { txtInputText TextArea
@@ -155,8 +173,11 @@
     }
   }
   { btnOptions Button
-    MoveScaled(18,1,10,4)
+    MoveScaled(129,1,10,4)
     Visible = False
     Text = ("Options")
+  }
+  { lblNextLine Label
+    MoveScaled(29,1,46,4)
   }
 }

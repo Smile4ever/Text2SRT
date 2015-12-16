@@ -1,0 +1,38 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,37,26)
+  Text = ("Search and replace")
+  Utility = True
+  { rdbInputText RadioButton
+    MoveScaled(11,0,24,4)
+    Text = ("Input text")
+    Value = True
+  }
+  { rdbSrtOutput RadioButton
+    MoveScaled(11,4,24,4)
+    Text = ("Output (SRT) text")
+  }
+  { txtFind TextBox
+    MoveScaled(11,9,24,4)
+  }
+  { lblFind Label
+    MoveScaled(1,9,10,4)
+    Text = ("Find:")
+  }
+  { lblReplace Label
+    MoveScaled(1,14,10,4)
+    Text = ("Replace:")
+  }
+  { txtReplace TextBox
+    MoveScaled(11,14,24,4)
+  }
+  { btnReplaceAll Button
+    MoveScaled(19,20,16,4)
+    Text = ("Replace all")
+  }
+  { lblSource Label
+    MoveScaled(1,1,10,4)
+    Text = ("Source:")
+  }
+}
