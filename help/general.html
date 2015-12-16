@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>General</title>
+</head>
+<body>
+<h1>General</h1>
+Make SRT subtitles for music videos or movies by clicking.
+<h2>Step 1: Setting the options</h2>
+<p>In the right panel, choose which kind (movie, music video) you want to subtitle. After that, choose the way you will provide the input text (movie text or lyrics).</p>
+
+<p>Movie (length &gt; 15 minutes)
+	<ul>
+		<li>Auto paste movie text (default): this option requires that you copy the movie text to the clipboard before going to Step 2.</li>
+		<li>Manual paste: this option requires that you copy the movie text to the clipboard and paste it in the left textbox before going to Step 2.</li>
+	</ul>
+</p>
+<p>Music videos (length &lt; 15 minutes)
+	<ul>
+		<li>Search lyrics (default): try to find the lyrics based on the filename (<a href="./filename.html">click here for the filename requirements</a>)</li>
+		<li>Auto paste lyrics: this option will paste the lyrics from the clipboard. Make sure you copied them from somewhere else before going to Step 2.</li>
+		<li>Manual paste: copy the lyrics to the clipboard and paste them yourself in the left textbox before going to Step 2.</li>
+	</ul>
+</p>
+<h2>Step 2: Open video file and verify the length</h2>
+<p>Click "Open video file" and open the music video or movie. The video file will open and the recording will start.</p>
+<p>The length of the video file is automatically calculated. If the calculated length is incorrect, you can change it in Options -> Advanced. It is advised that you use the "hms" notation: 5h9m7s (5 hours, 9 minutes and 7 seconds).</p>
+<p>You can also choose to use the "mm:ss" format so 05:09 means 5 minutes and 9 seconds (zeros are required here).</p>
+
+<h2>Step 3: Recording</h2>
+<p>After the recording started, you can see that [Recording ..] is displayed in the title bar. This means that the button "Add line" is enabled and you can start registering the time when you hear a sentence. Click "Add line" (as fast as you can) whenever you hear a sentence that equals to the "Next up". This sentence is taken from the left textbox. It will be added to the right textbox, including the time interval that will be calculated from the "Add line" and "Add pause" button presses.</p>
+<p>If there is silence for a few seconds, you can finish the current line with "Add pause". This allows for discontinuous subtitling with pauses (for music, or if there is nothing said during a time interval).</p>
+<p>In the right textbox, the SRT output text is displayed (this will become the SRT subtitle). You can make changes to this text if you know what you're doing.</p>
+
+<h2>Step 4: Saving the subtitle</h2>
+<p>When there are no input lines left be added, the "Add line" button changes into "Save SRT". This allows for saving the result.</p>
+<p>Tip: some media players like VLC Media Player and MPV detect subtitles automatically if you name them correct. For example, if your video file is called "movie.mp4", saving your subtitle under the name "movie.srt" allows for automatic subtitle selection.</p>
+</body>
+</html>

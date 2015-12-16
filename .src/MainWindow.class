@@ -133,9 +133,9 @@ Public Sub ScrollDown(lineCounter As Integer)
     txtSRT.Line = countLines + 1
     countLines = Split(txtInputText.Text, "\n").Count
     
-    If lineCounter + emptyInputLineCounter + 3 <> countlines Then
-        txtInputText.Line = lineCounter + emptyInputLineCounter + 2 'See next
-    Endif
+    'If lineCounter + emptyInputLineCounter + 3 <> countlines Then
+        'txtInputText.Line = lineCounter + emptyInputLineCounter + 2 'See next
+    'Endif
 End
 
 
@@ -315,7 +315,7 @@ Public Sub btnStart_Click()
         btnStart.Text = "Restart"
         emptyInputLineCounter = 0
         btnAddPause.Enabled = True
-        txtInputText.Line = 0
+        'txtInputText.Line = 0
     End If
     
 End
@@ -341,7 +341,7 @@ End
 
 Public Sub btnHelp_Click()
     
-    HelpWindow.Show()
+    FBrowser.Show()
     
 End
 
@@ -629,7 +629,7 @@ Public Sub optionsPanel_MouseUp()
     'Message("It is now " & TimeCalc.getTime(Time(Now)))
     'Message("It was " & TimeCalc.getTime(timeoptionschanged))
     If TimeCalc.getTime(Time(Now)) == TimeCalc.getTime(timeoptionschanged) Then
-        ShowMessage("ander item" & optionsPanel.Index)
+        'ShowMessage("ander item" & optionsPanel.Index)
     Else
         optionsPanel.Width = 29
         optionsPanel.AutoResize = True
@@ -677,8 +677,7 @@ End
 
 Public Sub submenuHelpAndUsage_Click()
 
-    HelpWindow.Show
-
+    FBrowser.Show()
 End
 
 Public Sub txtInputText_Change()

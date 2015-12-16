@@ -17,7 +17,7 @@ Public Function GetTime() As String
 End
 
 Public Sub Log(strMessage As String)
-  Dim intLength As Integer
+  'Dim intLength As Integer
   Dim strTime As String
   
   strTime = GetTime()

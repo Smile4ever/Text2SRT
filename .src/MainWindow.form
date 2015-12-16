@@ -162,9 +162,10 @@
   }
   { HSplit1 HSplit
     MoveScaled(2,6,103,52)
-    { txtInputText TextArea
+    { txtInputText TextEditor
       MoveScaled(0,0,46,52)
       Wrap = True
+      ShowLineNumber = True
     }
     { txtSRT TextArea
       MoveScaled(46,0,47,52)
