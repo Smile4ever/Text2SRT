@@ -1,0 +1,301 @@
+' Gambas class file
+
+'This code was taken from the example WebBrowser project
+
+Private $sLastLink As String
+Private helpPath As String = "./help/"
+Public Sub Form_Open()
+
+  'WebSettings.IconDatabase.Path = File.Dir(File.Dir(Temp$()))
+  WebSettings.Fonts.FixedFont = "Monospace"
+  WebSettings[WebSettings.PluginsEnabled] = False
+  WebSettings[WebSettings.JavascriptEnabled] = True
+  WebSettings[WebSettings.JavaEnabled] = False
+  WebSettings.Fonts.DefaultFontSize = 14
+  WebSettings.Fonts.DefaultFixedFontSize = 14
+
+  CreateView()
+  btnZoomNormal_Click
+  tabBrowser_Click
+  
+  GetView().Url = helpPath & "index.html"
+  
+End
+
+Private Sub GetView() As WebView
+  
+  Try Return tabBrowser[tabBrowser.Index].Children[0]
+  
+End
+
+Private Sub IsLastCurrentView() As Boolean
+  
+  Dim hView As WebView = GetView()
+  Return hView = Last
+  
+End
+
+Public Sub WebView_Link(Url As String)
+
+  If Not IsLastCurrentView() Then Return
+  $sLastLink = Url
+  lblStatus.Text = Url
+
+End
+
+Public Sub WebView_Status()
+
+  If Not IsLastCurrentView() Then Return
+  lblStatus.Text = GetView().Status
+
+End
+
+Public Sub WebView_Progress()
+
+  GetView().Status = "Loading..."
+  If Not IsLastCurrentView() Then Return
+
+  lblStatus.Text = GetView().Status
+  pgbLoad.Value = GetView().Progress
+  panLoad.Show
+
+End
+
+Public Sub WebView_Error()
+
+  Dim hView As WebView = GetView()
+  Dim sUrl As String
+  
+  sUrl = $sLastLink
+  If Not sUrl Then sUrl = txtURL.Text
+
+  hView.Status = "Unable to load: " & sUrl
+  hView.HTML = "<h3>Unable to find the following URL:</h3>" & sUrl
+  If Not IsLastCurrentView() Then Return
+
+  lblStatus.Text = GetView().Status
+  pgbLoad.Hide
+
+End
+
+Public Sub WebView_Load()
+
+  Dim hView As WebView = GetView()
+
+  hView.Status = ""
+  
+  If Not IsLastCurrentView() Then Return
+
+  lblStatus.Text = ""
+  txtURL.Text = hView.Url
+  pgbLoad.Hide
+
+End
+
+Public Sub btnBack_Click()
+
+  GetView().Back
+
+End
+
+Public Sub btnForward_Click()
+
+  GetView().Forward
+
+End
+
+Public Sub btnZoomIn_Click()
+
+  GetView().Zoom = Round(GetView().Zoom * 1.25, -2)
+
+End
+
+Public Sub btnZoomOut_Click()
+
+  GetView().Zoom = Round(GetView().Zoom / 1.25, -2)
+
+End
+
+Public Sub btnZoomNormal_Click()
+
+  GetView().Zoom = 1
+
+End
+
+Public Sub WebView_Title()
+
+  Dim hView As WebView = Last
+  tabBrowser[hView.Tag].Text = hView.Title
+  If Not IsLastCurrentView() Then Return
+  Me.Title = hView.Title & " - Text2SRT Help"
+
+End
+
+Public Sub WebView_NewWindow((Modal) As Boolean)
+
+  CreateView()
+
+  Last.NewView = GetView()
+  
+End
+
+Private Sub CreateView()
+  
+  Dim iLast As Integer = tabBrowser.Count - 1
+  Dim hView As WebView
+
+  Object.Lock(tabBrowser)
+  Inc tabBrowser.Count
+  Object.Lock(tabBrowser)
+  tabBrowser[iLast + 1].Picture = tabBrowser[iLast].Picture
+  tabBrowser[iLast + 1].Text = tabBrowser[iLast].Text
+  tabBrowser[iLast].Text = ""
+  tabBrowser[iLast].Picture = Null
+  tabBrowser[iLast].Closable = True
+  Object.Lock(tabBrowser)
+  tabBrowser.Index = iLast
+  hView = New WebView(tabBrowser) As "WebView"
+  
+  hView.Tag = tabBrowser.Index
+  hView.Resize(1, 1)
+  hView.Url = helpPath & "index.html"
+  
+  Object.Unlock(tabBrowser)
+  Object.Unlock(tabBrowser)
+  Object.Unlock(tabBrowser)
+  tabBrowser_Click
+  txtURL.SetFocus
+  
+End
+
+
+Public Sub tabBrowser_Click()
+
+  Dim iLast As Integer = tabBrowser.Count - 1
+  Dim hView As WebView
+
+  If tabBrowser.Index = iLast Then 
+    CreateView()
+  Else
+    hView = GetView()
+    If hView.Title Then
+      Me.Title = hView.Title & " - Text2SRT Help"
+    Else
+      Me.Title = "Text2SRT Help"
+    Endif
+    tabBrowser.Text = hView.Title
+    
+    tabBrowser.Picture = hView.Icon
+    txtURL.Text = hView.Url
+    lblStatus.Text = hView.Status
+    pgbLoad.Value = hView.Progress
+    If hView.Progress > 0 And If hView.Progress < 1 Then
+      panLoad.Show
+    Else
+      panLoad.Hide
+    Endif
+  Endif
+  
+End
+
+Public Sub tabBrowser_Close(Index As Integer)
+
+  Dim hView As WebView
+  
+  Try hView = tabBrowser[Index].Children[0]
+  If Not hView Then Return
+  
+  hView.Delete
+  
+  Object.Lock(tabBrowser)
+  tabBrowser[Index].Delete
+  Object.UnLock(tabBrowser)
+  If Index = tabBrowser.Index Then
+    If tabBrowser.Index = (tabBrowser.Count - 1) And If tabBrowser.Index > 0 Then
+      tabBrowser.Index = tabBrowser.Index - 1
+    Else
+      tabBrowser_Click
+    Endif
+  Endif  
+
+End
+
+Public Sub btnFind_Click()
+
+  Dim hView As WebView = GetView()
+  
+  panFind.Visible = btnFind.Value
+  If btnFind.Value Then 
+    DoFind
+    txtFind.SetFocus
+  Else
+    hView.FindText("")
+  Endif
+
+End
+
+Private Sub DoFind(Optional bBackward As Boolean)
+  
+  Dim hView As WebView = GetView()
+  Dim sText As String
+  
+  sText = Trim(txtFind.Text)
+  
+  If sText And If hView.FindText(sText, bBackward, chkCaseSensitive.Value, True) Then ', chkHighlight.Value) Then
+    panFind.Background = &HFFDFDF
+  Else
+    panFind.Background = Color.Default
+    If Not sText Then hView.FindText("")
+  Endif
+  
+End
+
+
+Public Sub txtFind_Change()
+
+  DoFind
+
+End
+
+Public Sub chkCaseSensitive_Click()
+
+  DoFind
+
+End
+
+Public Sub chkHighlight_Click()
+
+  Dim hView As WebView 
+  
+  If Not chkHighlight.Value Then 
+    hView = GetView()
+    hView.FindText("",,,, True)
+  Else
+    DoFind
+  Endif
+
+End
+
+Public Sub btnNext_Click()
+
+  DoFind
+
+End
+
+Public Sub btnPrevious_Click()
+
+  DoFind(True)
+
+End
+
+Public Sub btnClearFind_Click()
+
+  txtFind.Text = ""
+
+End
+
+Public Sub txtFind_Activate()
+
+  DoFind
+
+End

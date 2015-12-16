@@ -1,15 +1,14 @@
 Requirements
 ------------
 - Any Linux distribution
-- Gambas 3: gambas-ide gambas3-gb-net gambas3-gb-net-curl gambas3-gb-net-smtp gambas3-gb-qt4 gambas3-gb-form-editor gambas3-gb-qt4-webkit gb.eval.highlight gb.eval
+- Gambas 3: gambas-ide gambas3-gb-net gambas3-gb-net-curl gambas3-gb-net-smtp gambas3-gb-qt4 gambas3-gb-form-editor gambas3-gb-qt4-webkit gambas3-gb-eval-highlight gambas3-gb-eval
 - ffmpeg or libav-tools (avconv)
 - git
 - libnotify
 - xdg-utils
 - pkill (for pause functionality)
-<!-- 
-- gambas3-gb-gtk (for GTK support) -> cannot be used because we depend on gambas3-gb-qt4-webkit
--->
+- ~~gambas3-gb-gtk (for GTK support)~~ (cannot be used because we depend on gambas3-gb-qt4-webkit)
+
 Recommended players:
 * mpv
 * VLC Media Player
