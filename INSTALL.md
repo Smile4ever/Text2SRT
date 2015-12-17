@@ -45,13 +45,16 @@ If you have not installed the required packages, do it now using your packaging 
 - cd
 - git clone https://github.com/Smile4ever/Text2SRT.git
 - cd Text2SRT
-- sudo mkdir /usr/lib/text2srt
-- sudo cp -r . /usr/lib/text2srt/
-- sudo cp /usr/lib/text2srt/desktop-integration/text2srt.desktop /usr/share/applications
+- mkdir ~/.local/share/text2srt
+- cp -r . ~/.local/share/text2srt/
+- mkdir ~/.local/share/applications
+- cd ~/.local/share/text2srt
+- cp desktop-integration/text2srt.desktop ~/.local/share/applications
 
 If you have a GTK environment and you wish to use the GTK style for Text2SRT, do this:
-- cd /usr/lib/text2srt/
-- cp desktop-integration/FBrowser .gambas/FBrowser
+- mkdir .gambas
+- cp desktop-integration/FBROWSER .gambas/FBROWSER
 - cp desktop-integration/gtk2/.project .project
+(gtk3 is also available)
 
 You can now open Text2SRT from your Applications menu (category Utility).
