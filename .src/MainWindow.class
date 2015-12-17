@@ -710,3 +710,11 @@ Public Sub OpenHelp()
     
 End
 
+
+Public Sub txtSRT_Change()
+    
+    If SyncWindow.Visible Then
+        SyncWindow.inputTextChanged(txtSRT.Text)
+    Endif
+
+End

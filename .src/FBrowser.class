@@ -1,5 +1,8 @@
 ' Gambas class file
 
+Class WebView
+Class WebSettings
+
 'This code was taken from the example WebBrowser project
 
 Private $sLastLink As String

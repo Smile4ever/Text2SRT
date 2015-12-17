@@ -1,6 +1,6 @@
 ' Gambas class file
 
-Public Sub btnSync_Click()
+Public Sub preview()
 
     Dim syncTime As Float
     Dim playRate As Float
@@ -50,8 +50,19 @@ End
 Public Sub Form_Open()
 
     txtOriginal.Text = MainWindow.getOutputText()
-
+    If txtTime.Text <> "" Then
+        preview()
+    Endif
+    txtOriginal_Change()
 End
+
+Public Sub btnSync_Click()
+    
+    MainWindow.setOutputText(txtSynced.Text)
+    Me.Close
+    
+End
+
 
 Public Sub AddSyncTime(timeString As String, timeToAdd As String) As String
     Dim hours As String = TimeCalc.ConvertDecimalTimeToHTime(timeString, True, "h")
@@ -66,12 +77,15 @@ Public Sub AddSyncTime(timeString As String, timeToAdd As String) As String
     Dim milliseconds As Integer
     
     Dim newDate As Date
+    Dim intOverflow As Integer
     
     If InStr(timeToAdd, "+") = 1 Then
         secondsInt += Val(Mid(timeToAdd, 2)) 'Skip over +
+        
     Endif
     If InStr(timeToAdd, "-") = 1 Then
         secondsInt -= Val(Mid(timeToAdd, 2)) 'Skip over -
+        lblType.Text = Val(Mid(timeToAdd, 2)) & " sec faster"
     Endif
 
     'secondsInt = Val(seconds) 'get rid of milliseconds
@@ -80,6 +94,20 @@ Public Sub AddSyncTime(timeString As String, timeToAdd As String) As String
 
     If secondsInt < 0 Then
         secondsInt = 0 'prevent crash
+    Endif
+    If secondsInt > 59 Then
+        intOverflow = secondsInt / 60
+        secondsInt = secondsInt % 60
+        minutesInt += intOverflow
+    Endif
+    If minutesInt > 59 Then
+        intOverflow = minutesInt / 60
+        minutesInt = minutesInt % 60
+        hoursInt += intOverflow
+    Endif
+    
+    If hoursInt > 23 Then
+        Return 'not supported
     Endif
 
     newDate = Date(Year(Now), Month(Now), Day(Now), hoursInt, minutesInt, secondsInt, milliseconds)
@@ -109,9 +137,42 @@ End
 Public Sub txtTime_Change()
 
     If Len(txtTime.Text) > 1 Then
-        btnSync_Click
+        If InStr(txtTime.Text, "+") = 1 Then
+            lblType.Text = Val(Mid(txtTime.Text, 2)) & " sec slower"
+        Else
+            If InStr(txtTime.Text, "-") = 1 Then
+                lblType.Text = Val(Mid(txtTime.Text, 2)) & " sec faster"
+            Endif
+        Endif
+        If Val(txtTime.Text) > (60 * 60 * 24) - 1 Then
+            MainWindow.ShowMessage("24 hours and more is not supported (max " & ((60 * 60 * 24) - 1) & " sec)", "Not supported")
+            
+        Else
+             preview()
+        Endif
+       
     Endif
     If Len(txtTime.Text) == 1 Or Len(txtTime.Text) == 0 Then
         txtSynced.Text = txtOriginal.Text
+        lblType.Text = ""
     Endif
+End
+
+Public Sub inputTextChanged(inputText As String)
+    
+  txtOriginal.Text = inputText  
+  preview()
+    
+End
+
+
+Public Sub txtOriginal_Change()
+
+    If txtOriginal.Text == "" Then
+        btnSync.Visible = False
+        MainWindow.ShowMessage("Make sure you have text in the SRT output text box. The SRT output text box is the text box on the right in the main window.")
+    Else
+        btnSync.Visible = True
+    Endif
+
 End

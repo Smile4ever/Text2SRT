@@ -1,5 +1,5 @@
 [Desktop Entry]
-Exec=~/.local/share/text2srt/text2srt.sh
+Exec=sh ~/.local/share/text2srt/text2srt.sh
 Icon=none
 Type=Application
 Terminal=false

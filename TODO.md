@@ -6,7 +6,10 @@ Features to be implemented:
 * check if subtitles already exist, ask what to do
 * basic markup for SRT subtitles
 * improve support for movies
-* synchronize subtitles (ongoing) with rate too (not started)
+* synchronize subtitles with rate too (not started)
+
+Bugs:
+* NextUp not working
 
 ---------------------
 Features implemented:
@@ -20,3 +23,4 @@ Features implemented:
 * search & replace
 * line numbers for the input textbox
 * HTML documentation about Text2SRT, available with F1
+* synchronize subtitles

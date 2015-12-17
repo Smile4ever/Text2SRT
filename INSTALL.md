@@ -52,8 +52,6 @@ If you have not installed the required packages, do it now using your packaging 
 - cp desktop-integration/text2srt.desktop ~/.local/share/applications
 
 If you have a GTK environment and you wish to use the GTK style for Text2SRT, do this:
-- mkdir .gambas
-- cp desktop-integration/FBROWSER .gambas/FBROWSER
 - cp desktop-integration/gtk2/.project .project
 (gtk3 is also available)
 

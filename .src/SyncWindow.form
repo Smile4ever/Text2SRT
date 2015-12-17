@@ -10,11 +10,11 @@
     MoveScaled(34,24,29,39)
   }
   { txtTime TextBox
-    MoveScaled(29,2,24,4)
+    MoveScaled(29,2,18,4)
     Text = ("+2")
   }
   { btnSync Button
-    MoveScaled(37,19,16,4)
+    MoveScaled(45,19,18,4)
     Text = ("Sync")
   }
   { lblSyncTime Label
@@ -27,7 +27,10 @@
     Text = ("Play rate (0.6-1.4):")
   }
   { txtPlayRate TextBox
-    MoveScaled(29,7,24,4)
+    MoveScaled(29,7,18,4)
     Visible = False
+  }
+  { lblType Label
+    MoveScaled(48,2,14,4)
   }
 }

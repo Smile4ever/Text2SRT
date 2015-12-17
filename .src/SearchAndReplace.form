@@ -3,7 +3,6 @@
 { Form Form
   MoveScaled(0,0,37,26)
   Text = ("Search and replace")
-  Utility = True
   { rdbInputText RadioButton
     MoveScaled(11,0,24,4)
     Text = ("Input text")
