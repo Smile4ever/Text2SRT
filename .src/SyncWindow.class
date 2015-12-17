@@ -1,0 +1,117 @@
+' Gambas class file
+
+Public Sub btnSync_Click()
+
+    Dim syncTime As Float
+    Dim playRate As Float
+    Dim allTimes As String[]
+    
+    'Sync
+    Dim time1 As String
+    Dim time2 As String
+    Dim i As Integer
+    Dim fixed As String
+    Dim cleanPeriod As String
+    Dim periodArray As String[]
+    
+    If txtTime.Text <> Null Then
+        syncTime = Val(txtTime.Text)
+    Endif
+    If txtPlayRate.Text <> Null Then
+        playRate = Val(txtPlayRate.Text)
+    Endif
+   
+    allTimes = GetAllTimes()
+    
+    txtSynced.Text = txtOriginal.Text
+    For i = 0 To allTimes.Count - 1
+        cleanPeriod = Replace(allTimes[i], " ", "")
+        periodArray = Split(cleanPeriod, "-->")
+        time1 = periodArray[0]
+        time2 = periodArray[periodArray.Length - 1]
+        
+        If time1 <> ".?." Then
+            fixed = AddSyncTime(time1, txtTime.Text)
+        Else
+            fixed = ".?."
+        Endif
+        
+        fixed &= " --> "
+        
+        If time2 <> ".?." Then
+            fixed &= AddSyncTime(time2, txtTime.Text)
+        Else
+            fixed &= ".?."
+        Endif
+        txtSynced.Text = Replace(txtSynced.Text, allTimes[i], fixed)
+    Next
+End
+
+Public Sub Form_Open()
+
+    txtOriginal.Text = MainWindow.getOutputText()
+
+End
+
+Public Sub AddSyncTime(timeString As String, timeToAdd As String) As String
+    Dim hours As String = TimeCalc.ConvertDecimalTimeToHTime(timeString, True, "h")
+    Dim minutes As String = TimeCalc.ConvertDecimalTimeToHTime(timeString, True, "m")
+    Dim seconds As String = TimeCalc.ConvertDecimalTimeToHTime(timeString, True, "s")
+    
+    Dim hoursInt As Integer = Val(hours)
+    Dim minutesInt As Integer = Val(minutes)
+    Dim secondsInt As Integer = Val(seconds) 'populate for below
+    
+    Dim secondsMs As String
+    Dim milliseconds As Integer
+    
+    Dim newDate As Date
+    
+    If InStr(timeToAdd, "+") = 1 Then
+        secondsInt += Val(Mid(timeToAdd, 2)) 'Skip over +
+    Endif
+    If InStr(timeToAdd, "-") = 1 Then
+        secondsInt -= Val(Mid(timeToAdd, 2)) 'Skip over -
+    Endif
+
+    'secondsInt = Val(seconds) 'get rid of milliseconds
+    secondsMs = Replace(seconds, ",", ".") 'needed for the next
+    milliseconds = Val(Mid(secondsMs, InStr(secondsMs, ".") + 1)) 'remove dot, convert to int
+
+    If secondsInt < 0 Then
+        secondsInt = 0 'prevent crash
+    Endif
+
+    newDate = Date(Year(Now), Month(Now), Day(Now), hoursInt, minutesInt, secondsInt, milliseconds)
+    
+    'Message("hours " & hoursInt & "minutes" & minutesInt & "seconds" & secondsInt)
+    Return TimeCalc.getTime(newDate)
+End
+
+
+Public Sub GetAllTimes() As String[]
+    
+  Dim i As Integer
+  Dim everything As String[]
+  Dim allTimes As New String[]
+  
+  everything = Split(txtOriginal.Text, "\n")
+  
+  For i = 0 To everything.Count - 1
+      If InStr(everything[i], "-->") Then
+          allTimes.Add(everything[i])
+      Endif
+  Next
+    Return allTimes
+End
+
+
+Public Sub txtTime_Change()
+
+    If Len(txtTime.Text) > 1 Then
+        btnSync_Click
+    Endif
+    If Len(txtTime.Text) == 1 Or Len(txtTime.Text) == 0 Then
+        txtSynced.Text = txtOriginal.Text
+    Endif
+End

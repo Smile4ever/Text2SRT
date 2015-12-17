@@ -4,6 +4,7 @@
 
 Private $sLastLink As String
 Private helpPath As String = "./help/"
+
 Public Sub Form_Open()
 
   'WebSettings.IconDatabase.Path = File.Dir(File.Dir(Temp$()))
@@ -158,7 +159,7 @@ Private Sub CreateView()
   
   hView.Tag = tabBrowser.Index
   hView.Resize(1, 1)
-  hView.Url = helpPath & "index.html"
+  hView.Url = helpPath & "Index.html"
   
   Object.Unlock(tabBrowser)
   Object.Unlock(tabBrowser)

@@ -17,7 +17,7 @@ Public Sub _new()
 End
 
 Public Sub Form_Open()
-    
+
     ReloadConfiguration()
     
 End
@@ -30,6 +30,7 @@ Public Sub ReloadConfiguration()
     UpdateButtons()
     UpdatePlayers()
     hsplit1.Layout = [45, 55]
+    
     
     'For i = 0 To cmbPlayers.List.Count - 1
     '    If cmbPlayers[i].Text = "mpv" Then 'player-resumer
@@ -85,17 +86,17 @@ Public Sub AddSRTItem()
     
     DebugWindow.Log("We are now at " & strTime & " if we may believe the function WhereWereWe")
     DebugWindow.Log("TimeCalc.getTime() calculates " & TimeCalc.getTime(strTime) & " for " & strTime)
-       
+    
     If lineCounter < lyricsCleanArray.Count Then
         txtSRT.Text = Replace(txtSRT.Text, strSecondTime, TimeCalc.getTime(strTime))
         If lineCounter + 1 == lyricsCleanArray.Count Then
             DebugWindow.Log("For the end time, TimeCalc.ConvertHTimeToDecimal calculates " & TimeCalc.ConvertHTimeToDecimal(txtLength.Text))
             strSecondTime = TimeCalc.ConvertHTimeToDecimal(txtLength.Text) & ",000"
         End If
-
+        
         srtItem = (lineCounter + 1) & "\n" & TimeCalc.getTime(strTime) & " --> " & strSecondTime & "\n" & lyricsCleanArray[lineCounter]
         txtSRT.Text &= srtItem & "\n\n"
-
+        
         lineCounter += 1
         If lineCounter == lyricsCleanArray.Count Then
             StopRecording()
@@ -104,7 +105,7 @@ Public Sub AddSRTItem()
         End If
         ScrollDown(lineCounter - 1)
     End If
-
+    
 End
 
 Public Function PausedTimePassed() As Date
@@ -114,6 +115,7 @@ Public Function PausedTimePassed() As Date
 End
 
 Public Function WhereWereWe() As Date
+
     DebugWindow.Log("Starttime is " & startTime)
     DebugWindow.Log("now is " & Now)
     DebugWindow.Log("timepassed is " & timePassed)
@@ -123,10 +125,11 @@ Public Function WhereWereWe() As Date
 End
 
 Public Sub ScrollDown(lineCounter As Integer)
+
     Dim countLines As Integer
     
     If Trim(Split(txtInputText.Text, "\n")[lineCounter]) == "" Then
-       emptyInputLineCounter += 1
+        emptyInputLineCounter += 1
     Endif
     
     countLines = Split(txtSRT.Text, "\n").Count
@@ -134,10 +137,9 @@ Public Sub ScrollDown(lineCounter As Integer)
     countLines = Split(txtInputText.Text, "\n").Count
     
     'If lineCounter + emptyInputLineCounter + 3 <> countlines Then
-        'txtInputText.Line = lineCounter + emptyInputLineCounter + 2 'See next
+    'txtInputText.Line = lineCounter + emptyInputLineCounter + 2 'See next
     'Endif
 End
-
 
 Public Sub btnAddPause_Click()
     
@@ -147,7 +149,7 @@ Public Sub btnAddPause_Click()
     
     Dim lyricsCleanArray As String[] = Split(strLyricsClean, "\n")
     Dim strSecondTime As String = ".?."
-     
+    
     If lineCounter < lyricsCleanArray.Count Then
         txtSRT.Text = Replace(txtSRT.Text, strSecondTime, TimeCalc.getTime(strTime))
         If lineCounter + 1 == lyricsCleanArray.Count Then
@@ -179,14 +181,14 @@ Public Sub btnAddLine_Click()
 End
 
 Public Sub Form_Resize()
-
+    
     Dim minHeight As Integer = 70
     
     txtSRT.Height = MainWindow.Height - minHeight
     txtInputText.Height = MainWindow.Height - minHeight
     optionsPanel.Height = MainWindow.Height - minHeight
     HSplit1.Height = MainWindow.Height - minHeight
-
+    
     btnHelp.Text = "Help and usage"
     btnHelp.Width = 192
     btnHelp.Visible = True
@@ -196,9 +198,9 @@ Public Sub Form_Resize()
     lblNextLine.Visible = True
     lblNextUp.Visible = True
     btnOptions.Visible = False
-
+    
     lblNextLine.Width = btnAddPause.ScreenX - 30 - lblNextLine.ScreenX 
-
+    
     If Me.Width < 900 Then
         btnHelp.Width = 60
         btnHelp.Text = "Help"
@@ -213,7 +215,7 @@ Public Sub Form_Resize()
             btnOptions.Move(btnHelp.X, btnHelp.Y)
             btnOptions.Visible = True
         Endif
-
+        
         If Me.Width < 550 Then
             lblNextUp.Visible = False
             lblNextLine.Visible = False
@@ -233,7 +235,7 @@ End
 Public Function StartIsValid() As Boolean
     
     Dim intMinuteLength As Integer
-        
+    
     If txtLength.Text = "" Then
         Message("Length is required. For more information, see Help and Usage.")
         Return False
@@ -337,11 +339,12 @@ Public Sub UpdateNextUp()
     Endif
     
     lblNextLine.Text = nextUp
+
 End
 
 Public Sub btnHelp_Click()
     
-    FBrowser.Show()
+    OpenHelp()
     
 End
 
@@ -373,23 +376,22 @@ Public Sub btnOpen_Click()
     Else
         strProgram = "ffmpeg"
     Endif
-   
+    
     filename = Dialog.Path
     If InStr(filename, ".srt") > 0 Then
         ShowMessage("Please do not open the SRT file, but the video to be subtitled")
         Return
     Endif
-      
+    
     Shell strProgram & " -i " & Shell$(Dialog.Path) & " 2>&1 | grep Duration | cut -d ' ' -f 4 | sed s/,//" To strFileSize
     DebugWindow.Log("------------------------------------------")
     DebugWindow.Log("Opened the file " & Dialog.Path)
     DebugWindow.Log("The program " & strProgram & " has calculated the length " & strFileSize)
     txtLength.Text = Mid(strFileSize, 1, 8)
     
-    
     btnStart_Click()
     
-'Catch
+    'Catch
     'Message.Info(Error.Text)
     
 End
@@ -560,12 +562,13 @@ Public Function ShowMessage(text As String, Optional title As String = "Text2SRT
 End
 
 Public Sub btnTooEarly_Click()
-
+    
     Dim lastIndex As Integer = RInStr(txtSRT.Text, "-->")
     Dim lastTime As String
+
     If txtSRT.Length > 20 Then
         lastTime = Mid(txtSRT.Text, lastIndex - 13, 12)
-    
+        
         txtSRT.Text = Replace(txtSRT.Text, lastTime, TimeCalc.getTime(WhereWereWe()))
         ScrollDown(lineCounter)
     Endif
@@ -582,22 +585,23 @@ Public Sub StopRecording()
     
 End
 
-
 Public Sub btnStopRecording_Click()
-
+    
     StopRecording()
     txtSRT.Text = Replace(txtSRT.Text, ".?.", TimeCalc.getTime(TimeCalc.ConvertHTimeToDecimal(txtLength.Text)))
     Shell "pkill " & strCommand
+
 End
 
 Public Sub btnOptions_Click()
+
     Toggle_Options()
-   
+    
 End
 
 Public Sub Toggle_Options(Optional show As Boolean = Not optionsPanel.Visible)
     
-     optionsPanel.Visible = show
+    optionsPanel.Visible = show
     If optionsPanel.Visible Then
         optionsPanel.Width = Me.Width - 20
         optionsPanel.X = 10
@@ -609,16 +613,16 @@ Public Sub Toggle_Options(Optional show As Boolean = Not optionsPanel.Visible)
     
 End
 
-
 Public Sub Form_KeyRelease()
-
+    
     If Key.Code = Key.F12 Then
         DebugWindow.Show()
     Endif
-
+    
 End
 
 Public Sub optionsPanel_Click()
+
     timeoptionschanged = Now
     
 End
@@ -635,53 +639,69 @@ Public Sub optionsPanel_MouseUp()
         optionsPanel.AutoResize = True
         Form_Resize()
     Endif
-
+    
 End
 
 Public Sub submenuOpen_Click()
-
+    
     btnOpen_Click()
-
+    
 End
 
 Public Sub submenuSearchAndReplace_Click()
-
+    
     SearchAndReplace.Show()
-
+    
 End
 
 Public Sub getInputText() As String
-
-  Return txtInputText.Text
-
+    
+    Return txtInputText.Text
+    
 End
 
 Public Sub setInputText(text As String)
-
-  txtInputText.Text = text 
-
+    
+    txtInputText.Text = text 
+    
 End
 
 Public Sub getOutputText() As String
-
-  Return txtSRT.Text
-
+    
+    Return txtSRT.Text
+    
 End
 
 Public Sub setOutputText(text As String)
-
-  txtSRT.Text = text 
-
+    
+    txtSRT.Text = text 
+    
 End
 
-
 Public Sub submenuHelpAndUsage_Click()
-
-    FBrowser.Show()
+    
+    OpenHelp()
+    
 End
 
 Public Sub txtInputText_Change()
-
+    
     UpdateNextUp()
-
+    
 End
+
+Public Sub submenuSync_Click()
+    
+    SyncWindow.Show
+    
+End
+
+Public Sub OpenHelp()
+    
+    Component.Load("gb.gui.qt.webkit")
+    FBrowser.Show()
+    Catch
+        Desktop.Open("./help/index.html")
+    
+End
+

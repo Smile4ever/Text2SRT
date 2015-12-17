@@ -6,6 +6,7 @@ Features to be implemented:
 * check if subtitles already exist, ask what to do
 * basic markup for SRT subtitles
 * improve support for movies
+* synchronize subtitles (ongoing) with rate too (not started)
 
 ---------------------
 Features implemented:

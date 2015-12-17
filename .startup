@@ -5,13 +5,13 @@ Text2SRT
 0.0.1
 
 gb.image
-gb.gui.qt
+gb.gui
 gb.form
+gb.desktop.x11
+gb.desktop
 gb.eval
 gb.eval.highlight
 gb.form.editor
-gb.gui.qt.webkit
 gb.net
 gb.net.curl
-gb.net.smtp
 

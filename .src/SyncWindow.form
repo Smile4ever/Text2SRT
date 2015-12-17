@@ -1,0 +1,33 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,64,64)
+  Text = ("Synchronize subtitles")
+  { txtOriginal TextEditor
+    MoveScaled(2,24,31,39)
+  }
+  { txtSynced TextEditor
+    MoveScaled(34,24,29,39)
+  }
+  { txtTime TextBox
+    MoveScaled(29,2,24,4)
+    Text = ("+2")
+  }
+  { btnSync Button
+    MoveScaled(37,19,16,4)
+    Text = ("Sync")
+  }
+  { lblSyncTime Label
+    MoveScaled(2,2,24,4)
+    Text = ("Sync the subtitles by (+, -):")
+  }
+  { lblPlayRate Label
+    MoveScaled(2,7,27,4)
+    Visible = False
+    Text = ("Play rate (0.6-1.4):")
+  }
+  { txtPlayRate TextBox
+    MoveScaled(29,7,24,4)
+    Visible = False
+  }
+}

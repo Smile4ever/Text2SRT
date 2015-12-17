@@ -11,6 +11,9 @@
   }
   { menuTools Menu
     Text = ("Tools")
+    { submenuSync Menu
+      Text = ("Synchronize subtitles")
+    }
     { submenuSearchAndReplace Menu
       Text = ("Search and replace")
       Shortcut = "Ctrl+R"
