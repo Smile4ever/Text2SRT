@@ -41,7 +41,6 @@ Public Sub ReloadConfiguration()
     
     tempDate = Now
     timePassed = tempDate - tempDate
-    
 End
 
 Public Sub UpdateButtons()
@@ -199,7 +198,12 @@ Public Sub Form_Resize()
     lblNextUp.Visible = True
     btnOptions.Visible = False
     
-    lblNextLine.Width = btnAddPause.ScreenX - 30 - lblNextLine.ScreenX 
+    If btnAddPause.ScreenX - 30 > 0 Then
+        lblNextLine.Width = btnAddPause.ScreenX - 30 - lblNextLine.ScreenX 
+    Endif
+    'Message(btnAddPause.ScreenX - 30 - lblNextLine.ScreenX, "Resultaat")
+    'Message(btnAddPause.ScreenX - 30)
+    
     
     If Me.Width < 900 Then
         btnHelp.Width = 60
@@ -308,8 +312,9 @@ Public Sub btnStart_Click()
         lineCounter = 0
         startTime = timenow
         
-        DebugWindow.Log("The start time is " & timenow)
+        UpdateNextUp()
         
+        DebugWindow.Log("The start time is " & timenow)
         btnPause.Text = "Pause"
         btnAddLine.Enabled = True
         btnAddPause.Enabled = True
@@ -323,7 +328,6 @@ Public Sub btnStart_Click()
 End
 
 Public Sub UpdateNextUp()
-    
     'limit text length
     Dim nextUp As String = CleanInputText(txtInputText.Text)[lineCounter]
     Dim textLength As Integer = lblNextLine.Width / 6.65 '6.65 is char width
@@ -333,11 +337,11 @@ Public Sub UpdateNextUp()
     shortenedText = Mid(nextUp, 1, textLength)
     spacepos = RInStr(shortenedText, " ")
     
-    If textLength < Len(nextUp) Then
+    If textLength < Len(nextUp) And textLength > 0 Then
         
         nextUp = Mid(nextUp, 1, spacepos) & ".." 'break on a space
     Endif
-    
+
     lblNextLine.Text = nextUp
 
 End

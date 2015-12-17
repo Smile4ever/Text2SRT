@@ -81,14 +81,12 @@ Public Sub AddSyncTime(timeString As String, timeToAdd As String) As String
     
     If InStr(timeToAdd, "+") = 1 Then
         secondsInt += Val(Mid(timeToAdd, 2)) 'Skip over +
-        
     Endif
+    
     If InStr(timeToAdd, "-") = 1 Then
         secondsInt -= Val(Mid(timeToAdd, 2)) 'Skip over -
-        lblType.Text = Val(Mid(timeToAdd, 2)) & " sec faster"
     Endif
 
-    'secondsInt = Val(seconds) 'get rid of milliseconds
     secondsMs = Replace(seconds, ",", ".") 'needed for the next
     milliseconds = Val(Mid(secondsMs, InStr(secondsMs, ".") + 1)) 'remove dot, convert to int
 

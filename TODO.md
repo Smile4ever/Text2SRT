@@ -8,9 +8,6 @@ Features to be implemented:
 * improve support for movies
 * synchronize subtitles with rate too (not started)
 
-Bugs:
-* NextUp not working
-
 ---------------------
 Features implemented:
 * Support 6h5m6s notation for length
