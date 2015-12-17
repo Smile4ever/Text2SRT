@@ -1,1 +1,1 @@
-gbx3 /usr/lib/text2srt/
+gbx3 ~/.local/share/text2srt/
