@@ -5,7 +5,7 @@ Text2SRT
 0.0.1
 
 gb.image
-gb.gui
+gb.gtk
 gb.form
 gb.desktop.x11
 gb.desktop

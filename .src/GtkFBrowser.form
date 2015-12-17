@@ -1,7 +1,0 @@
-# Gambas Form File 3.0
-
-{ Form Form
-  MoveScaled(0,0,169,98)
-  Text = ("Text2SRT Help")
-  Icon = Picture["icon:/small/gambas"]
-}
